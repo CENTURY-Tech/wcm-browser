@@ -2,16 +2,22 @@
   "name": "wcm",
   "version": "0.0.0",
   "description": "Clear cut dependency management for Web Components",
-  "main": "index.js",
+  "main": "dist/wcm.js",
   "scripts": {
     "postinstall": "bower install && typings install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "gulp build",
+    "lint": "gulp lint",
+    "test": "gulp test"
   },
   "author": "Century Tech",
   "license": "MIT",
   "devDependencies": {
     "bower": "^1.8.0",
-    "typescript": "^2.1.4",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-tslint": "^7.0.1",
+    "gulp-typescript": "^3.1.3",
+    "typescript": "^1.8.0",
     "typings": "^2.0.0"
   }
 }

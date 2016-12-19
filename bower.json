@@ -1,7 +1,7 @@
 {
   "name": "wcm",
   "description": "Clear cut dependency management for Web Components",
-  "main": "index.js",
+  "main": "dist/wcm.js",
   "authors": [
     "Century Tech"
   ],
