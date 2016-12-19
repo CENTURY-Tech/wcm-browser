@@ -1,4 +1,4 @@
-WCM
+Web Components Manifest
 ---
 Clear cut dependency management for Web Components
 
