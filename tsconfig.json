@@ -1,15 +1,25 @@
 {
   "compilerOptions": {
-    "rootDir": "source",
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "experimentalDecorators": true,
     "module": "commonjs",
-    "target": "es5"
+    "target": "es5",
+    "lib": [
+      "dom",
+      "es5",
+      "es2016.array.include",
+      "es2015.promise"
+    ],
+    "typeRoots": [
+      "typings/index.d.ts"
+    ],
+    "noImplicitAny": true,
+    "removeComments": true,
+    "experimentalDecorators": true
   },
+  "include": [
+    "source/**/*"
+  ],
   "exclude": [
     "node_modules",
-    "bower_components",
-    "typings/index.d.ts"
+    "bower_components"
   ]
 }

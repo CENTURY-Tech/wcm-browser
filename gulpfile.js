@@ -2,6 +2,7 @@
 
 // Dependencies
 const gulp = require('gulp');
+const concat = require('gulp-concat');
 const del = require('del');
 const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
@@ -13,9 +14,10 @@ const tsProject = ts.createProject('tsconfig.json');
  * Build the project.
  */
 gulp.task('build', ['clean:dist'], () => {
-  return tsProject.src()
+  return gulp.src([...tsProject.config.include, ...tsProject.config.compilerOptions.typeRoots])
     .pipe(tsProject())
-    .js.pipe(gulp.dest('dist'));
+    .pipe(concat('wcm.js'))
+    .pipe(gulp.dest('dist'));
 });
 
 /**
