@@ -1,0 +1,14 @@
+{
+  "name": "wcm",
+  "version": "0.0.0",
+  "description": "Clear cut dependency management for Web Components",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Century Tech",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^2.1.4"
+  }
+}
