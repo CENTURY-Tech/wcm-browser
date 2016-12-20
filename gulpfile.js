@@ -29,7 +29,7 @@ gulp.task('lint', () => {
     .pipe(tslint({
       formatter: 'verbose'
     }))
-    .pipe(tslint.report())
+    .pipe(tslint.report());
 });
 
 /**
