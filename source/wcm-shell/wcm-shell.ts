@@ -88,7 +88,7 @@ class WcmShell extends polymer.Base implements InterfaceWcmShell {
       }
     }
 
-    return dependencies.filter(x => x !== forComponent);
+    return dependencies.filter((x: string): boolean => x !== forComponent);
   }
 
 }
