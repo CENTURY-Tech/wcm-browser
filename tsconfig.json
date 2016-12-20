@@ -9,7 +9,6 @@
     "experimentalDecorators": true
   },
   "files": [
-    "typings/index.d.ts",
     "source/wcm-utils/wcm-utils.d.ts",
     "source/wcm-service/wcm-service.d.ts",
     "source/wcm-link/wcm-link.d.ts",

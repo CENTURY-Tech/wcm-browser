@@ -10,6 +10,10 @@
     "test": "gulp test",
     "docs": "gulp docs"
   },
+  "engines": {
+    "node": ">=6.9.1",
+    "npm": ">=3.10.8"
+  },
   "author": "Century Tech",
   "license": "MIT",
   "devDependencies": {

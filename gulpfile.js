@@ -15,7 +15,7 @@ const tsProject = ts.createProject('tsconfig.json');
  * Build the project.
  */
 gulp.task('build', ['clean:dist'], () => {
-  return tsProject.src()
+  return gulp.src([...tsProject.config.files, './typings/index.d.ts'])
     .pipe(ts(tsProject))
     .pipe(concat('wcm.js'))
     .pipe(gulp.dest('dist'));
