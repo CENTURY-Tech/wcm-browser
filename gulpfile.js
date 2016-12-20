@@ -6,6 +6,7 @@ const concat = require('gulp-concat');
 const del = require('del');
 const ts = require('gulp-typescript');
 const tslint = require('gulp-tslint');
+const typedoc = require('gulp-typedoc');
 
 // Typescript
 const tsProject = ts.createProject('tsconfig.json');
@@ -14,8 +15,8 @@ const tsProject = ts.createProject('tsconfig.json');
  * Build the project.
  */
 gulp.task('build', ['clean:dist'], () => {
-  return gulp.src([...tsProject.config.include, ...tsProject.config.compilerOptions.typeRoots])
-    .pipe(tsProject())
+  return tsProject.src()
+    .pipe(ts(tsProject))
     .pipe(concat('wcm.js'))
     .pipe(gulp.dest('dist'));
 });
@@ -36,6 +37,19 @@ gulp.task('lint', () => {
  */
 gulp.task('test', ['build'], () => {
   throw Error('Tests not yet defined');
+});
+
+/**
+ * Generate the documentation
+ */
+gulp.task('docs', () => {
+  return tsProject.src()
+    .pipe(typedoc({
+      out: 'docs',
+      module: tsProject.config.compilerOptions.module,
+      target: tsProject.config.compilerOptions.target,
+      experimentalDecorators: tsProject.config.compilerOptions.experimentalDecorators
+    }));
 });
 
 /**

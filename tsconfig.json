@@ -2,24 +2,25 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "lib": [
-      "dom",
-      "es5",
-      "es2016.array.include",
-      "es2015.promise"
-    ],
-    "typeRoots": [
-      "typings/index.d.ts"
-    ],
+    "rootDir": "source",
+    "outDir": "dist",
     "noImplicitAny": true,
     "removeComments": true,
     "experimentalDecorators": true
   },
-  "include": [
-    "source/**/*"
+  "files": [
+    "typings/index.d.ts",
+    "source/wcm-utils/wcm-utils.d.ts",
+    "source/wcm-service/wcm-service.d.ts",
+    "source/wcm-link/wcm-link.d.ts",
+    "source/wcm-shell/wcm-shell.d.ts",
+    "source/wcm-utils/wcm-utils.ts",
+    "source/wcm-service/wcm-service.ts",
+    "source/wcm-link/wcm-link.ts",
+    "source/wcm-shell/wcm-shell.ts"
   ],
   "exclude": [
-    "node_modules",
-    "bower_components"
+    "bower_components",
+    "node_modules"
   ]
 }

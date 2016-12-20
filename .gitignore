@@ -7,3 +7,6 @@ bower_components/
 node_modules/
 typings/
 npm-debug.log
+
+# Ignore generated documentation
+docs/
