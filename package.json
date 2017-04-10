@@ -10,12 +10,28 @@
     "test": "gulp test",
     "docs": "gulp docs"
   },
-  "engines": {
-    "node": ">=6.9.1",
-    "npm": ">=3.10.8"
-  },
-  "author": "Century Tech",
+  "keywords": [
+    "wcm",
+    "web",
+    "components",
+    "web-components"
+  ],
+  "author": "Century TECH",
+  "contributors": [
+    {
+      "name": "Iain Reid",
+      "email": "iainreid382@gmail.com",
+      "url": "https://github.com/iainreid820"
+    }
+  ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CENTURY-Tech/wcm/issues"
+  },
+  "homepage": "https://github.com/CENTURY-Tech/wcm#readme",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "bower": "^1.8.0",
     "del": "^2.2.2",

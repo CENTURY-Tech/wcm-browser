@@ -1,22 +1,27 @@
 {
-  "name": "wcm",
+  "name": "@ctek/wcm",
   "description": "Clear cut dependency management for Web Components",
   "main": "dist/wcm.js",
+  "dependencies": {
+    "polymer-ts": "^0.1.28",
+    "polymer": "^1.7.1",
+    "webcomponentsjs": "^0.7.23"
+  },
+  "keywords": [
+    "wcm",
+    "web",
+    "components",
+    "web-components"
+  ],
   "authors": [
     "Century Tech"
   ],
   "license": "MIT",
-  "homepage": "",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "test",
     "tests"
-  ],
-  "dependencies": {
-    "polymer-ts": "^0.1.28",
-    "polymer": "^1.7.1",
-    "webcomponentsjs": "^0.7.23"
-  }
+  ]
 }
