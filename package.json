@@ -1,5 +1,5 @@
 {
-  "name": "wcm",
+  "name": "@ctek/wcm",
   "version": "0.0.0",
   "description": "Clear cut dependency management for Web Components",
   "main": "dist/wcm.js",

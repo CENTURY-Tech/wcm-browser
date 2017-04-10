@@ -2,21 +2,21 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "rootDir": "source",
+    "rootDir": "src",
     "outDir": "dist",
     "noImplicitAny": true,
     "removeComments": true,
     "experimentalDecorators": true
   },
   "files": [
-    "source/wcm-utils/wcm-utils.d.ts",
-    "source/wcm-service/wcm-service.d.ts",
-    "source/wcm-link/wcm-link.d.ts",
-    "source/wcm-shell/wcm-shell.d.ts",
-    "source/wcm-utils/wcm-utils.ts",
-    "source/wcm-service/wcm-service.ts",
-    "source/wcm-link/wcm-link.ts",
-    "source/wcm-shell/wcm-shell.ts"
+    "src/wcm-utils/wcm-utils.d.ts",
+    "src/wcm-service/wcm-service.d.ts",
+    "src/wcm-link/wcm-link.d.ts",
+    "src/wcm-shell/wcm-shell.d.ts",
+    "src/wcm-utils/wcm-utils.ts",
+    "src/wcm-service/wcm-service.ts",
+    "src/wcm-link/wcm-link.ts",
+    "src/wcm-shell/wcm-shell.ts"
   ],
   "exclude": [
     "bower_components",
