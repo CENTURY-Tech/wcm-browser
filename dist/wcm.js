@@ -191,7 +191,7 @@ window.addEventListener("WebComponentsReady", function () {
             if (!this.for) {
                 throw new Error("Component name must be provided");
             }
-            void this.wcmService.importComponent(this.for).finally(function () { return void _this.wcmUtils.removeComponent(_this); });
+            void this.wcmService.importComponent(this.for).then(function () { return void _this.wcmUtils.removeComponent(_this); });
         };
         __decorate([
             property({ type: String })
