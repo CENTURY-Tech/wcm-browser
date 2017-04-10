@@ -10,6 +10,10 @@
     "test": "gulp test",
     "docs": "gulp docs"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CENTURY-Tech/wcm.git"
+  },
   "keywords": [
     "wcm",
     "web",
