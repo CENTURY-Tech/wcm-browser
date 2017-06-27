@@ -1,25 +1,23 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "rootDir": "./src",
+    "outFile": "./dist/wcm.js",
+    "module": "amd",
     "target": "es5",
-    "rootDir": "src",
-    "outDir": "dist",
-    "noImplicitAny": true,
+    "declaration": true,
+    "alwaysStrict": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "removeComments": true,
     "experimentalDecorators": true
   },
-  "files": [
-    "src/wcm-utils/wcm-utils.d.ts",
-    "src/wcm-service/wcm-service.d.ts",
-    "src/wcm-link/wcm-link.d.ts",
-    "src/wcm-shell/wcm-shell.d.ts",
-    "src/wcm-utils/wcm-utils.ts",
-    "src/wcm-service/wcm-service.ts",
-    "src/wcm-link/wcm-link.ts",
-    "src/wcm-shell/wcm-shell.ts"
+  "include": [
+    "./src",
+    "./typings"
   ],
   "exclude": [
-    "bower_components",
-    "node_modules"
+    "./bower_components",
+    "./node_modules"
   ]
 }

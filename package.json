@@ -5,8 +5,8 @@
   "main": "dist/wcm.js",
   "scripts": {
     "postinstall": "bower install && typings install",
-    "build": "gulp build",
-    "lint": "gulp lint",
+    "build": "tsc -p tsconfig.json",
+    "lint": "tslint --project .  --fix",
     "test": "gulp test",
     "docs": "gulp docs"
   },
@@ -17,16 +17,9 @@
   "author": "Century Tech",
   "license": "MIT",
   "devDependencies": {
-    "bower": "^1.8.0",
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-tslint": "^7.0.1",
-    "gulp-typedoc": "^2.0.1",
-    "gulp-typescript": "^2.13.5",
-    "tslint": "^4.1.1",
+    "tslint": "^5.4.3",
     "typedoc": "^0.5.1",
-    "typescript": "^1.8.5",
-    "typings": "^2.1.0"
+    "typescript": "^2.3.4",
+    "typings": "^2.1.1"
   }
 }

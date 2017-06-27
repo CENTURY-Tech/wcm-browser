@@ -7,6 +7,7 @@ bower_components/
 node_modules/
 typings/
 npm-debug.log
+package-lock.json
 
 # Ignore distribution files
 dist
