@@ -17,6 +17,80 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var WebComponentsManifest;
 (function (WebComponentsManifest) {
+    var Utils;
+    (function (Utils) {
+        function register(name) {
+            return function (target) {
+                document["registerElement"](name, { prototype: target.prototype });
+            };
+        }
+        Utils.register = register;
+        function fetch(url) {
+            return new Promise(function (resolve, reject) {
+                var request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        if (request.status === 200) {
+                            void resolve(request.responseText);
+                        }
+                        else {
+                            void reject(request.responseText);
+                        }
+                    }
+                };
+                void request.open("GET", url, true);
+                void request.send(null);
+            });
+        }
+        Utils.fetch = fetch;
+        function loadManifest(url) {
+            var _this = this;
+            return fetch(url)
+                .then(JSON.parse)
+                .then(function (manifest) {
+                return (_this.manifest = manifest);
+            });
+        }
+        Utils.loadManifest = loadManifest;
+        function importManifest(manifest) {
+            var _this = this;
+            return Promise.all(manifest.shrinkwrap.map(function (dependency) {
+                return importLink(dependency.rel, _this.generateDownloadUrl(dependency.name, "index.html"));
+            }));
+        }
+        Utils.importManifest = importManifest;
+        function importLink(rel, href) {
+            return new Promise(function (resolve) {
+                var link = document.head.querySelector("link[href=\"" + href + "\"]");
+                if (!link) {
+                    link = document.createElement("link");
+                    link.rel = rel;
+                    link.href = href;
+                    document.head.appendChild(link);
+                    link.addEventListener("load", function () { return void resolve(); });
+                }
+                else {
+                    resolve();
+                }
+            });
+        }
+        Utils.importLink = importLink;
+        function importScript(src) {
+            return new Promise(function (resolve) {
+                var script = document.head.querySelector("script[src=\"" + src + "\"]");
+                if (!script) {
+                    script = document.createElement("script");
+                    script.src = src;
+                    document.head.appendChild(script);
+                    script.addEventListener("load", function () { return void resolve(); });
+                }
+                else {
+                    resolve();
+                }
+            });
+        }
+        Utils.importScript = importScript;
+    })(Utils = WebComponentsManifest.Utils || (WebComponentsManifest.Utils = {}));
     var Shell = (function (_super) {
         __extends(Shell, _super);
         function Shell() {
@@ -39,13 +113,23 @@ var WebComponentsManifest;
         Shell.prototype.attachedCallback = function () {
             this.bootstrapApplication();
         };
+        Shell.prototype.getDependencyMetadata = function (dependencyName) {
+            return this.manifest.shrinkwrap.find(function (dependency) { return dependency.name === dependencyName; });
+        };
+        Shell.prototype.generateDownloadUrl = function (dependencyName, lookup) {
+            var dependencyMetadata = this.getDependencyMetadata(dependencyName);
+            return (dependencyMetadata.uri || this.manifest.uri)
+                .replace("<name>", dependencyName)
+                .replace("<version>", dependencyMetadata.name)
+                .replace("<lookup>", lookup);
+        };
         Shell.prototype.bootstrapApplication = function () {
             var _this = this;
             var shadow = this.attachShadow({ mode: "open" });
             var fragment = document.createDocumentFragment();
             return Promise.resolve(this.url)
-                .then(Utils.loadManifest)
-                .then(Utils.importManifest)
+                .then(Utils.loadManifest.bind(this))
+                .then(Utils.importManifest.bind(this))
                 .then(function () {
                 fragment.appendChild(document.createElement(_this.for || "slot"));
                 shadow.appendChild(fragment);
@@ -54,63 +138,62 @@ var WebComponentsManifest;
         return Shell;
     }(HTMLElement));
     Shell = __decorate([
-        RegisterComponent("wcm-shell")
+        Utils.register("wcm-shell")
     ], Shell);
     WebComponentsManifest.Shell = Shell;
-    function RegisterComponent(name) {
-        return function (target) {
-            document.registerElement(name, { prototype: target.prototype });
+    var Link = (function (_super) {
+        __extends(Link, _super);
+        function Link() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(Link.prototype, "type", {
+            get: function () {
+                return this.getAttribute("type");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Link.prototype, "for", {
+            get: function () {
+                return this.getAttribute("for");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Link.prototype, "lookup", {
+            get: function () {
+                return this.getAttribute("lookup");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Link.prototype.createdCallback = function () {
+            this.importDependency();
         };
-    }
-    WebComponentsManifest.RegisterComponent = RegisterComponent;
-    var Utils;
-    (function (Utils) {
-        function fetchUrl(url) {
-            return new Promise(function (resolve, reject) {
-                var request = new XMLHttpRequest();
-                request.onreadystatechange = function () {
-                    if (request.readyState === 4) {
-                        if (request.status === 200) {
-                            void resolve(request.responseText);
-                        }
-                        else {
-                            void reject(request.responseText);
-                        }
-                    }
-                };
-                void request.open("GET", url, true);
-                void request.send(null);
-            });
-        }
-        Utils.fetchUrl = fetchUrl;
-        function loadManifest(url) {
-            return fetchUrl(url).then(JSON.parse);
-        }
-        Utils.loadManifest = loadManifest;
-        function importManifest(manifest) {
-            return Promise.all(manifest.shrinkwrap.map(function (dependency) {
-                return new Promise(function (resolve) {
-                    var attrs = {
-                        href: (dependency.uri || manifest.uri)
-                            .replace("<name>", dependency.name)
-                            .replace("<version>", dependency.version)
-                            .replace("<lookup>", dependency.lookup),
-                        rel: dependency.rel || "import",
-                    };
-                    var link = document.head.querySelector("link[href=\"" + attrs.href + "\"]");
-                    if (!link) {
-                        link = document.createElement("link");
-                        link.rel = attrs.rel;
-                        link.href = attrs.href;
-                        document.head.appendChild(link);
-                        link.addEventListener("load", function () { return void resolve(); });
-                    }
-                    else {
-                        resolve();
-                    }
-                });
-            }));
-        }
-        Utils.importManifest = importManifest;
-    })(Utils = WebComponentsManifest.Utils || (WebComponentsManifest.Utils = {}));
+        Link.prototype.getLocalShell = function () {
+            var elem = this;
+            while ((elem = elem.parentElement)) {
+                if (elem.tagName === "wcm-shell") {
+                    return elem;
+                }
+            }
+        };
+        Link.prototype.importDependency = function () {
+            var downloadUrl = this.getLocalShell().generateDownloadUrl(this.for, this.lookup);
+            switch (this.type) {
+                case "import":
+                case "stylesheet":
+                    return void Utils.importLink(this.type, downloadUrl);
+                case "script":
+                    return void Utils.importScript(downloadUrl);
+                default:
+                    throw Error("Could download \"" + downloadUrl + "\", unknown type \"" + this.type + "\"");
+            }
+        };
+        return Link;
+    }(HTMLElement));
+    Link = __decorate([
+        Utils.register("wcm-link")
+    ], Link);
+    WebComponentsManifest.Link = Link;
 })(WebComponentsManifest || (WebComponentsManifest = {}));

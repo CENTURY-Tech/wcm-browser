@@ -10,14 +10,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ]
   },
   "include": [
-    "./src",
-    "./typings"
-  ],
-  "exclude": [
-    "./bower_components",
-    "./node_modules"
+    "./src"
   ]
 }
