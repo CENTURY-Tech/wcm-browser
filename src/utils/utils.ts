@@ -1,18 +1,41 @@
 namespace WebComponentsManifest {
 
+  /**
+   * A collection of utility methods used throughout the library.
+   *
+   * @namespace WebComponentsManifest.Utils
+   */
   export namespace Utils {
 
+    /**
+     * A reference to the Manifest used throughout the Window.
+     */
     let manifest: Manifest;
 
+    /**
+     * This method will save the value provided as the Manifest to be used throughout the Window.
+     *
+     * @param {Object} val - The Manifest to be stored
+     *
+     * @returns {Void}
+     */
     export function setManifest(val: Manifest): void {
       manifest = val;
     }
 
+    /**
+     * This method will return the Manifest used throughout the Window.
+     *
+     * @returns {Object} The Manifest used throughout the Window
+     */
     export function getManifest(): Manifest {
       return manifest;
     }
 
-    export function getDependencyMetadata(dependencyName: string): DependencyMetadata {
+    /**
+     * @todo Clean, and document this function.
+     */
+    export function getDependency(dependencyName: string): Dependency {
       const dependency = manifest.shrinkwrap.find((dependency) => dependency.name === dependencyName);
 
       if (!dependency) {
@@ -22,8 +45,11 @@ namespace WebComponentsManifest {
       }
     }
 
+    /**
+     * @todo Clean, and document this function.
+     */
     export function generateDownloadUrl(dependencyName: string, lookup?: string): string {
-      const dependencyMetadata = getDependencyMetadata(dependencyName);
+      const dependencyMetadata = getDependency(dependencyName);
 
       return (dependencyMetadata.uri || manifest.uri)
         .replace("<name>", dependencyMetadata.name)
@@ -31,6 +57,9 @@ namespace WebComponentsManifest {
         .replace("<lookup>", lookup || "index.html");
     }
 
+    /**
+     * @todo Clean, and document this function.
+     */
     export function fetch(url: string): Promise<any> {
       return new Promise((resolve, reject): void => {
         const request: XMLHttpRequest = new XMLHttpRequest();
@@ -50,6 +79,9 @@ namespace WebComponentsManifest {
       });
     }
 
+    /**
+     * @todo Clean, and document this function.
+     */
     export function importLink(placement: HTMLElement, rel: string, href: string): Promise<void> {
       return new Promise<void>((resolve) => {
         let link: HTMLLinkElement = document.querySelector(`link[href="${href}"]`) as any;
@@ -69,6 +101,9 @@ namespace WebComponentsManifest {
       });
     }
 
+    /**
+     * @todo Clean, and document this function.
+     */
     export function importScript(placement: HTMLElement, src: string): Promise<void> {
       return new Promise<void>((resolve) => {
         let script: HTMLScriptElement = document.head.querySelector(`script[src="${src}"]`) as any;

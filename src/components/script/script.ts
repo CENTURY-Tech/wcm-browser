@@ -1,5 +1,12 @@
 namespace WebComponentsManifest {
 
+  /**
+   * A stand-in component for the native script tag that defers the loading of the targeted script until the links
+   * within the scope of the component are resolved.
+   *
+   * @class WebComponentsManifest.Script
+   * @extends HTMLElement
+   */
   @registerComponent("wcm-script")
   export class Script extends HTMLElement {
 
@@ -30,6 +37,13 @@ namespace WebComponentsManifest {
       setTimeout(() => this.importDependency());
     }
 
+    /**
+     * This is a private method that import the target required by this component.
+     *
+     * @private
+     *
+     * @returns {Void}
+     */
     private importDependency(): void {
       Promise.all([].map.call(this.parentElement.querySelectorAll("wcm-link"), (link) => {
         return new Promise((resolve) => {

@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || (function () {
         function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
-        function __() { this.constructor = d; }
+        function __ () { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var WebComponentsManifest;
 (function (WebComponentsManifest) {
-    function registerComponent(name) {
+    function registerComponent (name) {
         return function (target) {
             document["registerElement"](name, { prototype: target.prototype });
         };
@@ -28,7 +28,7 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Link = (function (_super) {
         __extends(Link, _super);
-        function Link() {
+        function Link () {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(Link.prototype, "type", {
@@ -69,7 +69,7 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Script = (function (_super) {
         __extends(Script, _super);
-        function Script() {
+        function Script () {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(Script.prototype, "for", {
@@ -98,8 +98,8 @@ var WebComponentsManifest;
                 });
             }))
                 .then(function () {
-                WebComponentsManifest.Utils.importScript(_this, _this.for ? WebComponentsManifest.Utils.generateDownloadUrl(_this.for, _this.lookup) : _this.lookup);
-            });
+                    WebComponentsManifest.Utils.importScript(_this, _this.for ? WebComponentsManifest.Utils.generateDownloadUrl(_this.for, _this.lookup) : _this.lookup);
+                });
         };
         return Script;
     }(HTMLElement));
@@ -112,7 +112,7 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Shell = (function (_super) {
         __extends(Shell, _super);
-        function Shell() {
+        function Shell () {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(Shell.prototype, "url", {
@@ -138,16 +138,16 @@ var WebComponentsManifest;
             var fragment = document.createDocumentFragment();
             return Promise.resolve(this.url)
                 .then(function (url) {
-                return WebComponentsManifest.Utils.fetch(url).then(JSON.parse);
-            })
+                    return WebComponentsManifest.Utils.fetch(url).then(JSON.parse);
+                })
                 .then(function (manifest) {
-                WebComponentsManifest.Utils.setManifest(manifest);
-                return WebComponentsManifest.Utils.importLink(_this, "import", WebComponentsManifest.Utils.generateDownloadUrl(manifest.main));
-            })
+                    WebComponentsManifest.Utils.setManifest(manifest);
+                    return WebComponentsManifest.Utils.importLink(_this, "import", WebComponentsManifest.Utils.generateDownloadUrl(manifest.main));
+                })
                 .then(function () {
-                fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.main));
-                shadow.appendChild(fragment);
-            });
+                    fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.main));
+                    shadow.appendChild(fragment);
+                });
         };
         return Shell;
     }(HTMLElement));
@@ -161,15 +161,15 @@ var WebComponentsManifest;
     var Utils;
     (function (Utils) {
         var manifest;
-        function setManifest(val) {
+        function setManifest (val) {
             manifest = val;
         }
         Utils.setManifest = setManifest;
-        function getManifest() {
+        function getManifest () {
             return manifest;
         }
         Utils.getManifest = getManifest;
-        function getDependencyMetadata(dependencyName) {
+        function getDependency (dependencyName) {
             var dependency = manifest.shrinkwrap.find(function (dependency) { return dependency.name === dependencyName; });
             if (!dependency) {
                 console.warn("No dependency was found with the name '%s'", dependencyName);
@@ -178,16 +178,16 @@ var WebComponentsManifest;
                 return dependency;
             }
         }
-        Utils.getDependencyMetadata = getDependencyMetadata;
-        function generateDownloadUrl(dependencyName, lookup) {
-            var dependencyMetadata = getDependencyMetadata(dependencyName);
+        Utils.getDependency = getDependency;
+        function generateDownloadUrl (dependencyName, lookup) {
+            var dependencyMetadata = getDependency(dependencyName);
             return (dependencyMetadata.uri || manifest.uri)
                 .replace("<name>", dependencyMetadata.name)
                 .replace("<version>", dependencyMetadata.version)
                 .replace("<lookup>", lookup || "index.html");
         }
         Utils.generateDownloadUrl = generateDownloadUrl;
-        function fetch(url) {
+        function fetch (url) {
             return new Promise(function (resolve, reject) {
                 var request = new XMLHttpRequest();
                 request.onreadystatechange = function () {
@@ -205,7 +205,7 @@ var WebComponentsManifest;
             });
         }
         Utils.fetch = fetch;
-        function importLink(placement, rel, href) {
+        function importLink (placement, rel, href) {
             return new Promise(function (resolve) {
                 var link = document.querySelector("link[href=\"" + href + "\"]");
                 if (!link) {
@@ -224,7 +224,7 @@ var WebComponentsManifest;
             });
         }
         Utils.importLink = importLink;
-        function importScript(placement, src) {
+        function importScript (placement, src) {
             return new Promise(function (resolve) {
                 var script = document.head.querySelector("script[src=\"" + src + "\"]");
                 if (!script) {

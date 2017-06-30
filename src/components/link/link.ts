@@ -1,14 +1,21 @@
 namespace WebComponentsManifest {
 
+  /**
+   * A stand-in component for the native link tag that ensures the required dependency is correctly versioned in
+   * accordance with the Manifest.
+   *
+   * @class WebComponentsManifest.Link
+   * @extends HTMLElement
+   */
   @registerComponent("wcm-link")
   export class Link extends HTMLElement {
 
     /**
-     * Which type of import this dependency represents, this is a enum of "import", "stylesheet", or "script".
+     * Which type of import this dependency represents, this is a enum of "import" or "stylesheet".
      *
      * @type {String}
      */
-    public get type(): "import" | "stylesheet" | "script" {
+    public get type(): "import" | "stylesheet" {
       return <any>this.getAttribute("type");
     }
 
@@ -39,6 +46,13 @@ namespace WebComponentsManifest {
       this.importDependency();
     }
 
+    /**
+     * This is a private method that import the target required by this component.
+     *
+     * @private
+     *
+     * @returns {Void}
+     */
     private importDependency(): void {
       Utils.importLink(this, this.type, Utils.generateDownloadUrl(this.for, this.lookup))
     }

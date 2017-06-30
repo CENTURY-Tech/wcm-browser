@@ -1,9 +1,13 @@
 namespace WebComponentsManifest {
 
+  /**
+   * The Shell component that initialises the Manifest at the specified URL and bootstraps the application accordingly.
+   *
+   * @class WebComponentsManifest.Shell
+   * @extends HTMLElement
+   */
   @registerComponent("wcm-shell")
   export class Shell extends HTMLElement {
-
-    public manifest: Manifest;
 
     /**
      * The URL of the Manifest to be loaded and then parsed by the Shell.
@@ -15,7 +19,7 @@ namespace WebComponentsManifest {
     }
 
     /**
-     * Which component the Shell should load as the application entry file after importing the Manifest.
+     * Which component the Shell should load as the application entry component after importing the Manifest.
      *
      * @type {String}
      */
