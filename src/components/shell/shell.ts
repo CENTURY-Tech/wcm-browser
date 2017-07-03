@@ -54,7 +54,7 @@ namespace WebComponentsManifest {
         })
         .then((manifest: Manifest): Promise<void> => {
           Utils.setManifest(manifest);
-          return Utils.importLink(this, "import", Utils.generateDownloadUrl(manifest.main));
+          return Utils.importLink.call(this, "import", Utils.generateDownloadUrl.call(this, manifest.main));
         })
         .then((): void => {
           fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.main));

@@ -34,7 +34,7 @@ namespace WebComponentsManifest {
      * @returns {Void}
      */
     public createdCallback(): void {
-      setTimeout(() => this.importDependency());
+      this.importScript();
     }
 
     /**
@@ -44,14 +44,12 @@ namespace WebComponentsManifest {
      *
      * @returns {Void}
      */
-    private importDependency(): void {
+    private importScript(): void {
       Promise.all([].map.call(this.parentElement.querySelectorAll("wcm-link"), (link) => {
-        return new Promise((resolve) => {
-          link.addEventListener("load", () => void resolve());
-        });
+        return !link.loaded && Utils.promisifyEvent.call(link, "load");
       }))
-        .then(() => {
-          Utils.importScript(this, this.for ? Utils.generateDownloadUrl(this.for, this.lookup) : this.lookup);
+        .then((): void => {
+          Utils.importScript.call(this, Utils.generateDownloadUrl.call(this, this.for, this.lookup));
         });
     }
 

@@ -10,13 +10,15 @@ namespace WebComponentsManifest {
   @registerComponent("wcm-link")
   export class Link extends HTMLElement {
 
+    public loaded: boolean;
+
     /**
      * Which type of import this dependency represents, this is a enum of "import" or "stylesheet".
      *
      * @type {String}
      */
-    public get type(): "import" | "stylesheet" {
-      return <any>this.getAttribute("type");
+    public get rel(): "import" | "stylesheet" {
+      return <any>this.getAttribute("rel");
     }
 
     /**
@@ -54,7 +56,8 @@ namespace WebComponentsManifest {
      * @returns {Void}
      */
     private importDependency(): void {
-      Utils.importLink(this, this.type, Utils.generateDownloadUrl(this.for, this.lookup))
+      Utils.importLink.call(this, this.rel, Utils.generateDownloadUrl.call(this, this.for, this.lookup))
+        .then(() => (this.loaded = true))
     }
 
   }

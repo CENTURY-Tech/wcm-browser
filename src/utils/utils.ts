@@ -48,13 +48,17 @@ namespace WebComponentsManifest {
     /**
      * @todo Clean, and document this function.
      */
-    export function generateDownloadUrl(dependencyName: string, lookup?: string): string {
-      const dependencyMetadata = getDependency(dependencyName);
+    export function generateDownloadUrl(this: HTMLElement, dependencyName: string, lookup?: string): string {
+      if (!dependencyName) {
+        return /.*\//.exec(this.baseURI)[0] + lookup;
+      } else {
+        const dependencyMetadata = getDependency(dependencyName);
 
-      return (dependencyMetadata.uri || manifest.uri)
-        .replace("<name>", dependencyMetadata.name)
-        .replace("<version>", dependencyMetadata.version)
-        .replace("<lookup>", lookup || "index.html");
+        return (dependencyMetadata.uri || manifest.uri)
+          .replace("<name>", dependencyMetadata.name)
+          .replace("<version>", dependencyMetadata.version)
+          .replace("<lookup>", lookup || "index.html");
+      }
     }
 
     /**
@@ -82,43 +86,50 @@ namespace WebComponentsManifest {
     /**
      * @todo Clean, and document this function.
      */
-    export function importLink(placement: HTMLElement, rel: string, href: string): Promise<void> {
-      return new Promise<void>((resolve) => {
-        let link: HTMLLinkElement = document.querySelector(`link[href="${href}"]`) as any;
-
-        if (!link) {
-          link = document.createElement("link");
-          link.rel = rel;
-          link.href = href;
-          document.head.appendChild(link);
-          link.addEventListener("load", () => {
-            placement.dispatchEvent(new Event("load"));
-            resolve();
-          })
-        } else {
-          resolve();
-        }
-      });
+    export function importLink(this: HTMLElement, rel: string, href: string): Promise<void> {
+      return Promise.resolve(document.querySelector(`link[href="${href}"]`))
+        .then((link: HTMLLinkElement): Promise<any> => {
+          if (!link) {
+            link = document.createElement("link");
+            link.rel = rel;
+            link.href = href;
+            document.head.appendChild(link);
+            return promisifyEvent.call(link, "load");
+          }
+        })
+        .then((): void => {
+          try {
+            this.dispatchEvent(new Event("load"))
+          } catch (err) { }
+        });
     }
 
     /**
      * @todo Clean, and document this function.
      */
-    export function importScript(placement: HTMLElement, src: string): Promise<void> {
-      return new Promise<void>((resolve) => {
-        let script: HTMLScriptElement = document.head.querySelector(`script[src="${src}"]`) as any;
+    export function importScript(this: HTMLElement, src: string): Promise<void> {
+      return Promise.resolve(document.head.querySelector(`script[src="${src}"]`))
+        .then((script: HTMLScriptElement): Promise<any> => {
+          if (!script) {
+            script = document.createElement("script");
+            script.src = src;
+            document.head.appendChild(script);
+            return promisifyEvent.call(script, "load");
+          }
+        })
+        .then((): void => {
+          try {
+            this.dispatchEvent(new Event("load"))
+          } catch (err) { }
+        });
+    }
 
-        if (!script) {
-          script = document.createElement("script");
-          script.src = /.*\//.exec(placement.baseURI)[0] + src;
-          document.head.appendChild(script);
-          script.addEventListener("load", () => {
-            placement.dispatchEvent(new Event("load"));
-            resolve();
-          });
-        } else {
-          resolve();
-        }
+    /**
+     * @todo Clean, and document this function.
+     */
+    export function promisifyEvent(this: HTMLElement, event: string): Promise<Event> {
+      return new Promise<Event>((resolve): void => {
+        this.addEventListener(event, (evt): void => resolve(evt));
       });
     }
 

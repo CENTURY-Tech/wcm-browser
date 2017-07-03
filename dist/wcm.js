@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || (function () {
         function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
-        function __ () { this.constructor = d; }
+        function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var WebComponentsManifest;
 (function (WebComponentsManifest) {
-    function registerComponent (name) {
+    function registerComponent(name) {
         return function (target) {
             document["registerElement"](name, { prototype: target.prototype });
         };
@@ -28,12 +28,12 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Link = (function (_super) {
         __extends(Link, _super);
-        function Link () {
+        function Link() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(Link.prototype, "type", {
+        Object.defineProperty(Link.prototype, "rel", {
             get: function () {
-                return this.getAttribute("type");
+                return this.getAttribute("rel");
             },
             enumerable: true,
             configurable: true
@@ -56,7 +56,9 @@ var WebComponentsManifest;
             this.importDependency();
         };
         Link.prototype.importDependency = function () {
-            WebComponentsManifest.Utils.importLink(this, this.type, WebComponentsManifest.Utils.generateDownloadUrl(this.for, this.lookup));
+            var _this = this;
+            WebComponentsManifest.Utils.importLink.call(this, this.rel, WebComponentsManifest.Utils.generateDownloadUrl.call(this, this.for, this.lookup))
+                .then(function () { return (_this.loaded = true); });
         };
         return Link;
     }(HTMLElement));
@@ -69,7 +71,7 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Script = (function (_super) {
         __extends(Script, _super);
-        function Script () {
+        function Script() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(Script.prototype, "for", {
@@ -87,19 +89,16 @@ var WebComponentsManifest;
             configurable: true
         });
         Script.prototype.createdCallback = function () {
-            var _this = this;
-            setTimeout(function () { return _this.importDependency(); });
+            this.importScript();
         };
-        Script.prototype.importDependency = function () {
+        Script.prototype.importScript = function () {
             var _this = this;
             Promise.all([].map.call(this.parentElement.querySelectorAll("wcm-link"), function (link) {
-                return new Promise(function (resolve) {
-                    link.addEventListener("load", function () { return void resolve(); });
-                });
+                return !link.loaded && WebComponentsManifest.Utils.promisifyEvent.call(link, "load");
             }))
                 .then(function () {
-                    WebComponentsManifest.Utils.importScript(_this, _this.for ? WebComponentsManifest.Utils.generateDownloadUrl(_this.for, _this.lookup) : _this.lookup);
-                });
+                WebComponentsManifest.Utils.importScript.call(_this, WebComponentsManifest.Utils.generateDownloadUrl.call(_this, _this.for, _this.lookup));
+            });
         };
         return Script;
     }(HTMLElement));
@@ -112,7 +111,7 @@ var WebComponentsManifest;
 (function (WebComponentsManifest) {
     var Shell = (function (_super) {
         __extends(Shell, _super);
-        function Shell () {
+        function Shell() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(Shell.prototype, "url", {
@@ -138,16 +137,16 @@ var WebComponentsManifest;
             var fragment = document.createDocumentFragment();
             return Promise.resolve(this.url)
                 .then(function (url) {
-                    return WebComponentsManifest.Utils.fetch(url).then(JSON.parse);
-                })
+                return WebComponentsManifest.Utils.fetch(url).then(JSON.parse);
+            })
                 .then(function (manifest) {
-                    WebComponentsManifest.Utils.setManifest(manifest);
-                    return WebComponentsManifest.Utils.importLink(_this, "import", WebComponentsManifest.Utils.generateDownloadUrl(manifest.main));
-                })
+                WebComponentsManifest.Utils.setManifest(manifest);
+                return WebComponentsManifest.Utils.importLink.call(_this, "import", WebComponentsManifest.Utils.generateDownloadUrl.call(_this, manifest.main));
+            })
                 .then(function () {
-                    fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.main));
-                    shadow.appendChild(fragment);
-                });
+                fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.main));
+                shadow.appendChild(fragment);
+            });
         };
         return Shell;
     }(HTMLElement));
@@ -161,33 +160,15 @@ var WebComponentsManifest;
     var Utils;
     (function (Utils) {
         var manifest;
-        function setManifest (val) {
+        function setManifest(val) {
             manifest = val;
         }
         Utils.setManifest = setManifest;
-        function getManifest () {
+        function getManifest() {
             return manifest;
         }
         Utils.getManifest = getManifest;
-        function getDependency (dependencyName) {
-            var dependency = manifest.shrinkwrap.find(function (dependency) { return dependency.name === dependencyName; });
-            if (!dependency) {
-                console.warn("No dependency was found with the name '%s'", dependencyName);
-            }
-            else {
-                return dependency;
-            }
-        }
-        Utils.getDependency = getDependency;
-        function generateDownloadUrl (dependencyName, lookup) {
-            var dependencyMetadata = getDependency(dependencyName);
-            return (dependencyMetadata.uri || manifest.uri)
-                .replace("<name>", dependencyMetadata.name)
-                .replace("<version>", dependencyMetadata.version)
-                .replace("<lookup>", lookup || "index.html");
-        }
-        Utils.generateDownloadUrl = generateDownloadUrl;
-        function fetch (url) {
+        function fetch(url) {
             return new Promise(function (resolve, reject) {
                 var request = new XMLHttpRequest();
                 request.onreadystatechange = function () {
@@ -205,40 +186,72 @@ var WebComponentsManifest;
             });
         }
         Utils.fetch = fetch;
-        function importLink (placement, rel, href) {
+        function getDependency(dependencyName) {
+            var dependency = manifest.shrinkwrap.find(function (dependency) { return dependency.name === dependencyName; });
+            if (!dependency) {
+                console.warn("No dependency was found with the name '%s'", dependencyName);
+            }
+            else {
+                return dependency;
+            }
+        }
+        Utils.getDependency = getDependency;
+        function generateDownloadUrl(dependencyName, lookup) {
+            if (!dependencyName) {
+                return /.*\//.exec(this.baseURI)[0] + lookup;
+            }
+            else {
+                var dependencyMetadata = getDependency(dependencyName);
+                return (dependencyMetadata.uri || manifest.uri)
+                    .replace("<name>", dependencyMetadata.name)
+                    .replace("<version>", dependencyMetadata.version)
+                    .replace("<lookup>", lookup || "index.html");
+            }
+        }
+        Utils.generateDownloadUrl = generateDownloadUrl;
+        function promisifyEvent(event) {
+            var _this = this;
             return new Promise(function (resolve) {
-                var link = document.querySelector("link[href=\"" + href + "\"]");
+                _this.addEventListener(event, function (evt) { return resolve(evt); });
+            });
+        }
+        Utils.promisifyEvent = promisifyEvent;
+        function importLink(rel, href) {
+            var _this = this;
+            return Promise.resolve(document.querySelector("link[href=\"" + href + "\"]"))
+                .then(function (link) {
                 if (!link) {
                     link = document.createElement("link");
                     link.rel = rel;
                     link.href = href;
                     document.head.appendChild(link);
-                    link.addEventListener("load", function () {
-                        placement.dispatchEvent(new Event("load"));
-                        resolve();
-                    });
+                    return promisifyEvent.call(link, "load");
                 }
-                else {
-                    resolve();
+            })
+                .then(function () {
+                try {
+                    _this.dispatchEvent(new Event("load"));
                 }
+                catch (err) { }
             });
         }
         Utils.importLink = importLink;
-        function importScript (placement, src) {
-            return new Promise(function (resolve) {
-                var script = document.head.querySelector("script[src=\"" + src + "\"]");
+        function importScript(src) {
+            var _this = this;
+            return Promise.resolve(document.head.querySelector("script[src=\"" + src + "\"]"))
+                .then(function (script) {
                 if (!script) {
                     script = document.createElement("script");
-                    script.src = /.*\//.exec(placement.baseURI)[0] + src;
+                    script.src = src;
                     document.head.appendChild(script);
-                    script.addEventListener("load", function () {
-                        placement.dispatchEvent(new Event("load"));
-                        resolve();
-                    });
+                    return promisifyEvent.call(script, "load");
                 }
-                else {
-                    resolve();
+            })
+                .then(function () {
+                try {
+                    _this.dispatchEvent(new Event("load"));
                 }
+                catch (err) { }
             });
         }
         Utils.importScript = importScript;
