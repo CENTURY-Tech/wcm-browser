@@ -1,4 +1,4 @@
-# Web Components Manifest
+# Web Components Manager
 
 Clear cut dependency management for Web Components
 
