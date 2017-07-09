@@ -16,15 +16,11 @@ With WCM, applications have explicitly defined dependencies that are resolved at
 This allows for continuous releases of a given dependency component, without affecting the end user.
 
 ### Notes about usage
-This library currently relies on [Polymer](https://github.com/Polymer/polymer), [PolymerTS](https://github.com/nippur72/PolymerTS), and [WebComponents.js](https://github.com/webcomponents/webcomponentsjs). It's important that they are all loaded before loading WCM, meaning that the head of your index file should include something similar to this:
+This library currently relies on [WebComponents.js](https://github.com/webcomponents/webcomponentsjs) when used in browsers that have not yet implemented basic support for Web Components. It's important that this is loaded before loading WCM, meaning that the head of your index file should include something similar to this:
 
 ```html
 <!-- Shim Web Components -->
 <script src="path/to/packages/.../webcomponentsjs/webcomponents-lite.js"></script>
-
-<!-- Load Polymer and the TS decorators -->
-<link rel="import" href="path/to/packages/.../polymer/polymer.html">
-<link rel="import" href="path/to/packages/.../polymer-ts/polymer-ts.html">
 
 <!-- Load WCM -->
 <script src="path/to/packages/.../wcm.js"></script>
