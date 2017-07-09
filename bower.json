@@ -15,8 +15,6 @@
     "tests"
   ],
   "dependencies": {
-    "polymer-ts": "^0.1.28",
-    "polymer": "^1.7.1",
     "webcomponentsjs": "^0.7.23"
   }
 }

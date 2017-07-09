@@ -1,9 +1,9 @@
-namespace WebComponentsManifest {
+namespace WebComponentsManager {
 
   /**
    * The Shell component that initialises the Manifest at the specified URL and bootstraps the application accordingly.
    *
-   * @class WebComponentsManifest.Shell
+   * @class WebComponentsManager.Shell
    * @extends HTMLElement
    */
   @registerComponent("wcm-shell")
@@ -45,16 +45,22 @@ namespace WebComponentsManifest {
      * @returns {Promise<Void>}
      */
     private bootstrapApplication(): Promise<void> {
-      const shadow = this.attachShadow({ mode: "open" });
+      const shadow = this.attachShadow && this.attachShadow({ mode: "open" }) || this;
       const fragment = document.createDocumentFragment();
 
       return Promise.resolve(this.url)
         .then((url: string): Promise<Manifest> => {
           return Utils.fetch(url).then(JSON.parse);
         })
-        .then((manifest: Manifest): Promise<void> => {
+        .then((manifest: Manifest): Promise<string> => {
           Utils.setManifest(manifest);
-          return Utils.importLink.call(this, "import", Utils.generateDownloadUrl.call(this, manifest.main));
+
+          if (this.main) {
+            return Utils.generateDownloadUrl.call(this, this.main)
+              .then((downloadUrl: string): Promise<void> => {
+                return Utils.importLink.call(this, "import", downloadUrl);
+              });
+          }
         })
         .then((): void => {
           fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.main));

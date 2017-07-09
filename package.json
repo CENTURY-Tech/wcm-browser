@@ -4,22 +4,22 @@
   "description": "Clear cut dependency management for Web Components",
   "main": "dist/wcm.js",
   "scripts": {
-    "postinstall": "bower install && typings install",
     "build": "tsc -p tsconfig.json",
-    "lint": "tslint --project .  --fix",
-    "test": "gulp test",
-    "docs": "gulp docs"
+    "docs": "typedoc --name WCM --mode file --out docs --hideGenerator",
+    "install": "bower install",
+    "lint": "tslint --project . --fix"
   },
   "engines": {
     "node": ">=6.9.1",
     "npm": ">=3.10.8"
   },
   "author": "Century Tech",
-  "license": "MIT",
+  "license": "LICENSE",
+  "dependencies": {},
   "devDependencies": {
+    "bower": "^1.8.0",
     "tslint": "^5.4.3",
     "typedoc": "^0.5.1",
     "typescript": "^2.3.4"
-  },
-  "dependencies": {}
+  }
 }
