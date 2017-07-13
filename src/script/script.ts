@@ -5,41 +5,46 @@ namespace WebComponentsManager {
    * within the scope of the component are resolved.
    *
    * @class WebComponentsManager.Script
-   * @extends HTMLElement
+   * @extends WebComponentsManager.Base
    */
-  @registerComponent("wcm-script")
+  @DOM.registerComponent("wcm-script")
   export class Script extends Base {
-
-    public static importTarget(this: Script): Promise<void> {
-      return Utils.promiseTimeout(30000,
-        Promise.all<void>([].map.call(this.parentElement.querySelectorAll("wcm-link, link"), (link: Link | HTMLLinkElement): Promise<void> => {
-          if (link.hasOwnProperty("whenLoaded")) {
-            console.log("CUSTOM")
-            return link["whenLoaded"] as Promise<void>;
-          } else {
-            console.log("VANILLA")
-            return link["import"] || Utils.promisifyEvent.call(link, "load");
-          }
-        }))
-          .then((): Promise<string> => {
-            return Utils.generateDownloadUrl.call(this, this.for, this.lookup);
-          })
-          .then((downloadUrl: string): void => {
-            return Utils.importScript.call(this, downloadUrl);
-          }),
-      )
-        .catch((err) => {
-          console.error("%s timeout", this.for || this.lookup, err);
-        });
-    }
 
     /**
      * Legacy callback support for WebComponents V0. This method will begin the import process under the current Shell.
      *
      * @returns {Void}
      */
-    public createdCallback(): void {
-      this.init().then(Script.importTarget.bind(this));
+    public createdCallback(this: Script): void {
+      Utils.timeoutPromise(5000,
+        Promise.all<void>([
+          ...[].map.call(this.ownerDocument.querySelectorAll("link"), DOM.waitForLink),
+          ...[].map.call(this.ownerDocument.querySelectorAll("wcm-link"), (link: Link) => {
+            return Utils.whenDefined(link, Utils.ready);
+          })
+        ])
+          .then((): Promise<string> => {
+            return Shrinkwrap.generateDownloadUrl(this, this.for, this.path);
+          })
+          .then((src: string): Promise<boolean> => {
+            let script = document.body.querySelector(`script[src="${src}"]`) as HTMLScriptElement;
+
+            if (!script) {
+              script = document.body.appendChild(DOM.createElement("script", { src }));
+
+              DOM.promisifyEvent(script, "load")
+                .then(() => {
+                  script[Utils.ready] = true;
+                });
+            }
+
+            return Utils.whenDefined<boolean>(script, Utils.ready);
+          })
+          .then((): void => {
+            this[Utils.ready] = true;
+          })
+      )
+        .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
     }
 
   }

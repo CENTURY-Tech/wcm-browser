@@ -1,13 +1,10 @@
 namespace WebComponentsManager {
 
   /**
-   * A collection of utility methods used throughout the library.
-   *
-   * @namespace WebComponentsManager.Utils
+   * @class WebComponentsManager.Base
+   * @extends HTMLElement
    */
   export abstract class Base extends HTMLElement {
-
-    public whenLoaded: Promise<void> | boolean;
 
     /**
      * The name of the dependency that should be imported.
@@ -19,16 +16,12 @@ namespace WebComponentsManager {
     }
 
     /**
-     * The lookup path to be imported.
+     * The path to be imported.
      *
      * @type {String}
      */
-    public get lookup(): string {
-      return this.getAttribute("lookup");
-    }
-
-    public async init(): Promise<void> {
-      Utils.promisifyAssignKey(this, "whenLoaded");
+    public get path(): string {
+      return this.getAttribute("path");
     }
 
   }

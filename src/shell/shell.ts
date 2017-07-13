@@ -6,8 +6,8 @@ namespace WebComponentsManager {
    * @class WebComponentsManager.Shell
    * @extends HTMLElement
    */
-  @registerComponent("wcm-shell")
-  export class Shell extends HTMLElement {
+  @DOM.registerComponent("wcm-shell")
+  export class Shell extends Base {
 
     /**
      * The URL of the Manifest to be loaded and then parsed by the Shell.
@@ -16,15 +16,6 @@ namespace WebComponentsManager {
      */
     public get url(): string {
       return this.getAttribute("url");
-    }
-
-    /**
-     * Which component the Shell should load as the application entry component after importing the Manifest.
-     *
-     * @type {String}
-     */
-    public get main(): string {
-      return this.getAttribute("main");
     }
 
     /**
@@ -50,20 +41,17 @@ namespace WebComponentsManager {
 
       return Promise.resolve(this.url)
         .then((url: string): Promise<Manifest> => {
-          return Utils.fetch(url).then(JSON.parse);
+          return Utils.fetchResource(url).then(JSON.parse);
         })
-        .then((manifest: Manifest): Promise<string> => {
-          Utils.setManifest(manifest);
+        .then((manifest: Manifest) => {
+          Shrinkwrap.manifest = manifest;
 
-          if (this.main) {
-            return Utils.generateDownloadUrl.call(this, this.main)
-              .then((downloadUrl: string): Promise<void> => {
-                return Utils.importLink.call(this, "import", downloadUrl);
-              });
+          if (this.for) {
+            DOM.createElement("wcm-link", this);
           }
         })
         .then((): void => {
-          fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.main));
+          fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.for));
           shadow.appendChild(fragment);
         });
     }

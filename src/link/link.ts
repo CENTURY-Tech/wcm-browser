@@ -1,13 +1,15 @@
 namespace WebComponentsManager {
 
+  export type HTMLLinkElementRel = "import" | "stylesheet";
+
   /**
    * A stand-in component for the native link tag that ensures the required dependency is correctly versioned in
    * accordance with the Manifest.
    *
    * @class WebComponentsManager.Link
-   * @extends HTMLElement
+   * @extends WebComponentsManager.Base
    */
-  @registerComponent("wcm-link")
+  @DOM.registerComponent("wcm-link")
   export class Link extends Base {
 
     /**
@@ -15,20 +17,8 @@ namespace WebComponentsManager {
      *
      * @type {String}
      */
-    public get rel(): "import" | "stylesheet" {
-      return this.getAttribute("rel") as any;
-    }
-
-    public static importTarget(this: Link): Promise<void> {
-      return Utils.promiseTimeout(30000,
-        Utils.generateDownloadUrl.call(this, this.for, this.lookup)
-          .then((downloadUrl: string): Promise<void> => {
-            return Utils.importLink.call(this, this.rel, downloadUrl);
-          }),
-      )
-        .catch((err) => {
-          console.error("%s timeout", this.for || this.lookup, err);
-        });
+    public get rel(): HTMLLinkElementRel {
+      return this.getAttribute("rel") as HTMLLinkElementRel;
     }
 
     /**
@@ -36,8 +26,28 @@ namespace WebComponentsManager {
      *
      * @returns {Void}
      */
-    public createdCallback(): void {
-      this.init().then(Link.importTarget.bind(this));
+    public createdCallback(this: Link): void {
+      Utils.timeoutPromise<void>(5000,
+        Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+          .then((href): Promise<boolean> => {
+            let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement;
+
+            if (!link) {
+              link = document.head.appendChild(DOM.createElement("link", { rel: this.rel || "import", href }));
+
+              DOM.waitForLink(link)
+                .then(() => {
+                  link[Utils.ready] = true;
+                });
+            }
+
+            return Utils.whenDefined<boolean>(link, Utils.ready);
+          })
+          .then((): void => {
+            this[Utils.ready] = true;
+          })
+      )
+        .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
     }
 
   }

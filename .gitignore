@@ -2,10 +2,9 @@
 .idea/
 .vscode/
 
-# Ignore all Node.js, Typescript, NPM, and Bower related paths
+# Ignore all Node.js, NPM, and Bower related paths
 bower_components/
 node_modules/
-typings/
 npm-debug.log
 package-lock.json
 
