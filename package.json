@@ -4,49 +4,24 @@
   "description": "Clear cut dependency management for Web Components",
   "main": "dist/wcm.js",
   "scripts": {
-    "postinstall": "bower install && typings install",
-    "build": "gulp build",
-    "lint": "gulp lint",
-    "test": "gulp test",
-    "docs": "gulp docs"
+    "build": "tsc -p tsconfig.json",
+    "postbuild": "uglifyjs dist/wcm.js -c -m -o dist/wcm.min.js",
+    "docs": "typedoc --name WCM --mode file --out docs --hideGenerator",
+    "install": "bower install",
+    "lint": "tslint --project . --fix"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/CENTURY-Tech/wcm.git"
   },
-  "keywords": [
-    "wcm",
-    "web",
-    "components",
-    "web-components"
-  ],
-  "author": "Century TECH",
-  "contributors": [
-    {
-      "name": "Iain Reid",
-      "email": "iainreid382@gmail.com",
-      "url": "https://github.com/iainreid820"
-    }
-  ],
-  "license": "SEE LICENSE",
-  "bugs": {
-    "url": "https://github.com/CENTURY-Tech/wcm/issues"
-  },
-  "homepage": "https://github.com/CENTURY-Tech/wcm#readme",
-  "files": [
-    "dist"
-  ],
+  "author": "Century Tech",
+  "license": "LICENSE",
+  "dependencies": {},
   "devDependencies": {
     "bower": "^1.8.0",
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-tslint": "^7.0.1",
-    "gulp-typedoc": "^2.0.1",
-    "gulp-typescript": "^2.13.5",
-    "tslint": "^4.1.1",
+    "tslint": "^5.4.3",
     "typedoc": "^0.5.1",
-    "typescript": "^1.8.5",
-    "typings": "^2.1.0"
+    "typescript": "^2.3.4",
+    "uglify-js": "^3.0.24"
   }
 }
