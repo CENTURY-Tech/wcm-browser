@@ -42,12 +42,15 @@ var WebComponentsManager;
         }
         DOM.waitForLink = waitForLink;
         function promisifyEvent(target, event) {
-            var handler = function (resolve) { return function (evt) {
-                target.removeEventListener(event, handler);
-                resolve(evt);
-            }; };
+            var handler = function (resolve) {
+                return function (evt) {
+                    target.removeEventListener(event, handler);
+                    resolve(evt);
+                };
+            };
             return new Promise(function (resolve) {
-                target.addEventListener(event, handler(resolve));
+                handler = handler(resolve);
+                target.addEventListener(event, handler);
             });
         }
         DOM.promisifyEvent = promisifyEvent;
@@ -85,6 +88,7 @@ var WebComponentsManager;
     var Utils;
     (function (Utils) {
         Utils.ready = Symbol();
+        Utils.timeoutDuration = 30000;
         function fetchResource(url) {
             return new Promise(function (resolve, reject) {
                 var request = new XMLHttpRequest();
@@ -173,7 +177,7 @@ var WebComponentsManager;
         });
         Link.prototype.createdCallback = function () {
             var _this = this;
-            WebComponentsManager.Utils.timeoutPromise(5000, WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
                 .then(function (href) {
                 var link = document.head.querySelector("link[href=\"" + href + "\"]");
                 if (!link) {
@@ -206,7 +210,7 @@ var WebComponentsManager;
         }
         Script.prototype.createdCallback = function () {
             var _this = this;
-            WebComponentsManager.Utils.timeoutPromise(5000, Promise.all([].map.call(this.ownerDocument.querySelectorAll("link"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
+            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, Promise.all([].map.call(this.ownerDocument.querySelectorAll("link"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
                 return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.Utils.ready);
             })))
                 .then(function () {
