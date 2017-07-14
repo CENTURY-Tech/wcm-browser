@@ -71,13 +71,16 @@ namespace WebComponentsManager {
     }
 
     export function promisifyEvent(target: HTMLElement, event: string): Promise<Event> {
-      const handler = (resolve) => (evt: Event): void => {
-        target.removeEventListener(event, handler);
-        resolve(evt);
+      let handler: any = (resolve) => {
+        return (evt: Event): void => {
+          target.removeEventListener(event, handler);
+          resolve(evt);
+        };
       };
 
       return new Promise((resolve): void => {
-        target.addEventListener(event, handler(resolve));
+        handler = handler(resolve);
+        target.addEventListener(event, handler);
       });
     }
 
