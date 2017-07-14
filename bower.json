@@ -1,7 +1,7 @@
 {
-  "name": "@ctek/wcm",
+  "name": "wcm",
   "description": "Clear cut dependency management for Web Components",
-  "main": "dist/wcm.js",
+  "main": "dist/wcm.min.js",
   "keywords": [
     "wcm",
     "web",
@@ -20,6 +20,6 @@
     "tests"
   ],
   "dependencies": {
-    "webcomponentsjs": "^0.7.23"
+    "webcomponentsjs": "~0"
   }
 }
