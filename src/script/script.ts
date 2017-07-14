@@ -16,7 +16,7 @@ namespace WebComponentsManager {
      * @returns {Void}
      */
     public createdCallback(this: Script): void {
-      Utils.timeoutPromise(5000,
+      Utils.timeoutPromise(Utils.timeoutDuration,
         Promise.all<void>([
           ...[].map.call(this.ownerDocument.querySelectorAll("link"), DOM.waitForLink),
           ...[].map.call(this.ownerDocument.querySelectorAll("wcm-link"), (link: Link) => {

@@ -27,7 +27,7 @@ namespace WebComponentsManager {
      * @returns {Void}
      */
     public createdCallback(this: Link): void {
-      Utils.timeoutPromise<void>(5000,
+      Utils.timeoutPromise<void>(Utils.timeoutDuration,
         Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
           .then((href): Promise<boolean> => {
             let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement;

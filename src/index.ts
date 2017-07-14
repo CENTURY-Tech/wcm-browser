@@ -138,6 +138,8 @@ namespace WebComponentsManager {
 
     export const ready = Symbol();
 
+    export let timeoutDuration = 30000;
+
     /**
      * @todo Clean, and document this function.
      */
