@@ -19,6 +19,7 @@ var WebComponentsManager;
 (function (WebComponentsManager) {
     var DOM;
     (function (DOM) {
+        DOM.ready = Symbol();
         function registerComponent(name) {
             return function (target) {
                 document["registerElement"](name, { prototype: target.prototype });
@@ -36,7 +37,7 @@ var WebComponentsManager;
         function waitForLink(link) {
             return link.import
                 ? Promise.all([].map.call(link.import.querySelectorAll("link"), waitForLink).concat([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
-                    return Utils.whenDefined(elem, Utils.ready);
+                    return Utils.whenDefined(elem, DOM.ready);
                 })))
                 : promisifyEvent(link, "load").then(function () { return link.import && waitForLink(link); });
         }
@@ -87,7 +88,6 @@ var WebComponentsManager;
     })(Shrinkwrap = WebComponentsManager.Shrinkwrap || (WebComponentsManager.Shrinkwrap = {}));
     var Utils;
     (function (Utils) {
-        Utils.ready = Symbol();
         Utils.timeoutDuration = 30000;
         function fetchResource(url) {
             return new Promise(function (resolve, reject) {
@@ -141,7 +141,9 @@ var WebComponentsManager;
     var Base = (function (_super) {
         __extends(Base, _super);
         function Base() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.observedAttributes = ["path"];
+            return _this;
         }
         Object.defineProperty(Base.prototype, "for", {
             get: function () {
@@ -157,8 +159,22 @@ var WebComponentsManager;
             enumerable: true,
             configurable: true
         });
+        Base.prototype.createdCallback = function () {
+            if (!this[Base.loader]) {
+                return;
+            }
+            if (this.for || this.path) {
+                this.attributeChangedCallback();
+            }
+        };
+        Base.prototype.attributeChangedCallback = function () {
+            delete this.attributeChangedCallback;
+            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, this[Base.loader]())
+                .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
+        };
         return Base;
     }(HTMLElement));
+    Base.loader = Symbol();
     WebComponentsManager.Base = Base;
 })(WebComponentsManager || (WebComponentsManager = {}));
 var WebComponentsManager;
@@ -175,24 +191,23 @@ var WebComponentsManager;
             enumerable: true,
             configurable: true
         });
-        Link.prototype.createdCallback = function () {
+        Link.prototype[WebComponentsManager.Base.loader] = function () {
             var _this = this;
-            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+            return WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
                 .then(function (href) {
                 var link = document.head.querySelector("link[href=\"" + href + "\"]");
                 if (!link) {
                     link = document.head.appendChild(WebComponentsManager.DOM.createElement("link", { rel: _this.rel || "import", href: href }));
                     WebComponentsManager.DOM.waitForLink(link)
                         .then(function () {
-                        link[WebComponentsManager.Utils.ready] = true;
+                        link[WebComponentsManager.DOM.ready] = true;
                     });
                 }
-                return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.Utils.ready);
+                return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
-                _this[WebComponentsManager.Utils.ready] = true;
-            }))
-                .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
+                _this[WebComponentsManager.DOM.ready] = true;
+            });
         };
         return Link;
     }(WebComponentsManager.Base));
@@ -208,10 +223,10 @@ var WebComponentsManager;
         function Script() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Script.prototype.createdCallback = function () {
+        Script.prototype[WebComponentsManager.Base.loader] = function () {
             var _this = this;
-            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, Promise.all([].map.call(this.ownerDocument.querySelectorAll("link"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
-                return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.Utils.ready);
+            return Promise.all([].map.call(this.ownerDocument.querySelectorAll("link"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
+                return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
             })))
                 .then(function () {
                 return WebComponentsManager.Shrinkwrap.generateDownloadUrl(_this, _this.for, _this.path);
@@ -222,15 +237,14 @@ var WebComponentsManager;
                     script = document.body.appendChild(WebComponentsManager.DOM.createElement("script", { src: src }));
                     WebComponentsManager.DOM.promisifyEvent(script, "load")
                         .then(function () {
-                        script[WebComponentsManager.Utils.ready] = true;
+                        script[WebComponentsManager.DOM.ready] = true;
                     });
                 }
-                return WebComponentsManager.Utils.whenDefined(script, WebComponentsManager.Utils.ready);
+                return WebComponentsManager.Utils.whenDefined(script, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
-                _this[WebComponentsManager.Utils.ready] = true;
-            }))
-                .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
+                _this[WebComponentsManager.DOM.ready] = true;
+            });
         };
         return Script;
     }(WebComponentsManager.Base));
@@ -266,8 +280,15 @@ var WebComponentsManager;
             })
                 .then(function (manifest) {
                 WebComponentsManager.Shrinkwrap.manifest = manifest;
-                if (_this.for) {
-                    WebComponentsManager.DOM.createElement("wcm-link", _this);
+                if (_this.for || _this.path) {
+                    var config = {};
+                    if (_this.for) {
+                        config.for = _this.for;
+                    }
+                    if (_this.path) {
+                        config.path = _this.path;
+                    }
+                    WebComponentsManager.DOM.createElement("wcm-link", config);
                 }
             })
                 .then(function () {

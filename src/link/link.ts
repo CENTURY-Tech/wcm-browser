@@ -21,33 +21,25 @@ namespace WebComponentsManager {
       return this.getAttribute("rel") as HTMLLinkElementRel;
     }
 
-    /**
-     * Legacy callback support for WebComponents V0. This method will begin the import process under the current Shell.
-     *
-     * @returns {Void}
-     */
-    public createdCallback(this: Link): void {
-      Utils.timeoutPromise<void>(Utils.timeoutDuration,
-        Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
-          .then((href): Promise<boolean> => {
-            let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement;
+    public [Base.loader](this: Link): Promise<void> {
+      return Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+        .then((href): Promise<boolean> => {
+          let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement;
 
-            if (!link) {
-              link = document.head.appendChild(DOM.createElement("link", { rel: this.rel || "import", href }));
+          if (!link) {
+            link = document.head.appendChild(DOM.createElement("link", { rel: this.rel || "import", href }));
 
-              DOM.waitForLink(link)
-                .then(() => {
-                  link[Utils.ready] = true;
-                });
-            }
+            DOM.waitForLink(link)
+              .then(() => {
+                link[DOM.ready] = true;
+              });
+          }
 
-            return Utils.whenDefined<boolean>(link, Utils.ready);
-          })
-          .then((): void => {
-            this[Utils.ready] = true;
-          })
-      )
-        .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
+          return Utils.whenDefined<boolean>(link, DOM.ready);
+        })
+        .then((): void => {
+          this[DOM.ready] = true;
+        });
     }
 
   }
