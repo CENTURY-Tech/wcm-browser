@@ -1,7 +1,5 @@
 namespace WebComponentsManager {
 
-
-
   /**
    * A stand-in component for the native script tag that defers the loading of the targeted script until the links
    * within the scope of the component are resolved.
