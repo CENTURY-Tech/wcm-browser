@@ -36,6 +36,8 @@ namespace WebComponentsManager {
       "wcm-script": Script;
     }
 
+    export const ready = Symbol();
+
     /**
      * This decorator registers the targeted class as a new custom Web Component with the name provided.
      *
@@ -64,7 +66,7 @@ namespace WebComponentsManager {
         ? Promise.all<void>([
           ...[].map.call(link.import.querySelectorAll("link"), waitForLink),
           ...[].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
-            return Utils.whenDefined(elem, Utils.ready);
+            return Utils.whenDefined(elem, DOM.ready);
           })
         ])
         : promisifyEvent(link, "load").then(() => link.import && waitForLink(link))
@@ -135,8 +137,6 @@ namespace WebComponentsManager {
    * @namespace WebComponentsManager.Utils
    */
   export namespace Utils {
-
-    export const ready = Symbol();
 
     export let timeoutDuration = 30000;
 

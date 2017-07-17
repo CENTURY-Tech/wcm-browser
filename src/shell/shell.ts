@@ -46,8 +46,18 @@ namespace WebComponentsManager {
         .then((manifest: Manifest) => {
           Shrinkwrap.manifest = manifest;
 
-          if (this.for) {
-            DOM.createElement("wcm-link", this);
+          if (this.for || this.path) {
+            const config: {[key in "for" | "path"]?: string} = {};
+
+            if (this.for) {
+              config.for = this.for;
+            }
+
+            if (this.path) {
+              config.path = this.path;
+            }
+
+            DOM.createElement("wcm-link", config);
           }
         })
         .then((): void => {
