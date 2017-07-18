@@ -12,7 +12,7 @@ namespace WebComponentsManager {
 
     public [Base.loader](this: Script): Promise<void> {
       return Promise.all<void>([
-        ...[].map.call(this.ownerDocument.querySelectorAll("link"), DOM.waitForLink),
+        ...[].map.call(this.ownerDocument.querySelectorAll("link[rel='import']"), DOM.waitForLink),
         ...[].map.call(this.ownerDocument.querySelectorAll("wcm-link"), (link: Link) => {
           return Utils.whenDefined(link, DOM.ready);
         })
