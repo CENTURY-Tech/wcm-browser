@@ -209,7 +209,6 @@ var WebComponentsManager;
                 return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
-                console.log("LOADED", _this.path);
                 _this[WebComponentsManager.DOM.ready] = true;
             });
         };
@@ -247,7 +246,6 @@ var WebComponentsManager;
                 return WebComponentsManager.Utils.whenDefined(script, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
-                console.log("LOADED", _this.path);
                 _this[WebComponentsManager.DOM.ready] = true;
             });
         };
