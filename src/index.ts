@@ -62,13 +62,9 @@ namespace WebComponentsManager {
     }
 
     export function waitForLink(link: HTMLLinkElement): Promise<void | void[]> {
-      if (link.rel === "stylesheet" && link.style) {
-        return Promise.resolve();
-      }
-
       return link.import
         ? Promise.all<void>([
-          ...[].map.call(link.import.querySelectorAll("link"), waitForLink),
+          ...[].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink),
           ...[].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
             return Utils.whenDefined(elem, DOM.ready);
           })

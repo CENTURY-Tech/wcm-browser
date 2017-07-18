@@ -35,11 +35,8 @@ var WebComponentsManager;
         }
         DOM.createElement = createElement;
         function waitForLink(link) {
-            if (link.rel === "stylesheet" && link.style) {
-                return Promise.resolve();
-            }
             return link.import
-                ? Promise.all([].map.call(link.import.querySelectorAll("link"), waitForLink).concat([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
+                ? Promise.all([].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink).concat([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
                     return Utils.whenDefined(elem, DOM.ready);
                 })))
                 : promisifyEvent(link, "load").then(function () { return waitForLink(link); });
@@ -292,7 +289,6 @@ var WebComponentsManager;
                         config.path = _this.path;
                     }
                     return WebComponentsManager.Utils.whenDefined(WebComponentsManager.DOM.createElement("wcm-link", config), WebComponentsManager.DOM.ready);
-                    ;
                 }
             })
                 .then(function () {
