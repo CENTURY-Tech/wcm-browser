@@ -61,15 +61,15 @@ namespace WebComponentsManager {
       return elem;
     }
 
-    export function waitForLink(link: HTMLLinkElement): Promise<void[]> {
+    export function waitForLink(link: HTMLLinkElement): Promise<void | void[]> {
       return link.import
         ? Promise.all<void>([
-          ...[].map.call(link.import.querySelectorAll("link"), waitForLink),
+          ...[].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink),
           ...[].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
             return Utils.whenDefined(elem, DOM.ready);
           })
         ])
-        : promisifyEvent(link, "load").then(() => link.import && waitForLink(link))
+        : promisifyEvent(link, "load").then(() => waitForLink(link));
     }
 
     export function promisifyEvent(target: HTMLElement, event: string): Promise<Event> {

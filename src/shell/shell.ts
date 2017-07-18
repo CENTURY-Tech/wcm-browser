@@ -57,13 +57,16 @@ namespace WebComponentsManager {
               config.path = this.path;
             }
 
-            DOM.createElement("wcm-link", config);
+            return Utils.whenDefined(DOM.createElement("wcm-link", config), DOM.ready);
           }
         })
         .then((): void => {
           fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.for));
           shadow.appendChild(fragment);
-        });
+        })
+        .then((): void => {
+          this[DOM.ready] = true;
+        })
     }
 
   }
