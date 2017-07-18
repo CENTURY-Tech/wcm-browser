@@ -225,7 +225,7 @@ var WebComponentsManager;
         }
         Script.prototype[WebComponentsManager.Base.loader] = function () {
             var _this = this;
-            return Promise.all([].map.call(this.ownerDocument.querySelectorAll("link"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
+            return Promise.all([].map.call(this.ownerDocument.querySelectorAll("link[rel='import']"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
                 return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
             })))
                 .then(function () {
