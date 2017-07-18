@@ -57,7 +57,7 @@ namespace WebComponentsManager {
               config.path = this.path;
             }
 
-            return Utils.whenDefined(DOM.createElement("wcm-link", config), DOM.ready);;
+            return Utils.whenDefined(DOM.createElement("wcm-link", config), DOM.ready);
           }
         })
         .then((): void => {
