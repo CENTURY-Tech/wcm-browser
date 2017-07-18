@@ -35,11 +35,14 @@ var WebComponentsManager;
         }
         DOM.createElement = createElement;
         function waitForLink(link) {
+            if (link.rel === "stylesheet" && link.style) {
+                return Promise.resolve();
+            }
             return link.import
                 ? Promise.all([].map.call(link.import.querySelectorAll("link"), waitForLink).concat([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
                     return Utils.whenDefined(elem, DOM.ready);
                 })))
-                : promisifyEvent(link, "load").then(function () { return link.import && waitForLink(link); });
+                : promisifyEvent(link, "load").then(function () { return waitForLink(link); });
         }
         DOM.waitForLink = waitForLink;
         function promisifyEvent(target, event) {
@@ -206,6 +209,7 @@ var WebComponentsManager;
                 return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
+                console.log("LOADED", _this.path);
                 _this[WebComponentsManager.DOM.ready] = true;
             });
         };
@@ -243,6 +247,7 @@ var WebComponentsManager;
                 return WebComponentsManager.Utils.whenDefined(script, WebComponentsManager.DOM.ready);
             })
                 .then(function () {
+                console.log("LOADED", _this.path);
                 _this[WebComponentsManager.DOM.ready] = true;
             });
         };
@@ -288,12 +293,16 @@ var WebComponentsManager;
                     if (_this.path) {
                         config.path = _this.path;
                     }
-                    WebComponentsManager.DOM.createElement("wcm-link", config);
+                    return WebComponentsManager.Utils.whenDefined(WebComponentsManager.DOM.createElement("wcm-link", config), WebComponentsManager.DOM.ready);
+                    ;
                 }
             })
                 .then(function () {
                 fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.for));
                 shadow.appendChild(fragment);
+            })
+                .then(function () {
+                _this[WebComponentsManager.DOM.ready] = true;
             });
         };
         return Shell;

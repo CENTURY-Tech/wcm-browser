@@ -61,7 +61,11 @@ namespace WebComponentsManager {
       return elem;
     }
 
-    export function waitForLink(link: HTMLLinkElement): Promise<void[]> {
+    export function waitForLink(link: HTMLLinkElement): Promise<void | void[]> {
+      if (link.rel === "stylesheet" && link.style) {
+        return Promise.resolve();
+      }
+
       return link.import
         ? Promise.all<void>([
           ...[].map.call(link.import.querySelectorAll("link"), waitForLink),
@@ -69,7 +73,7 @@ namespace WebComponentsManager {
             return Utils.whenDefined(elem, DOM.ready);
           })
         ])
-        : promisifyEvent(link, "load").then(() => link.import && waitForLink(link))
+        : promisifyEvent(link, "load").then(() => waitForLink(link));
     }
 
     export function promisifyEvent(target: HTMLElement, event: string): Promise<Event> {
