@@ -15,6 +15,18 @@ With WCM, applications have explicitly defined dependencies that are resolved at
 
 This allows for continuous releases of a given dependency component, without affecting the end user.
 
+## Installation
+We push versions to both NPM, under [the Ctek organisation](https://www.npmjs.com/org/ctek), and Bower, under the Ctek namespace and directly by name.
+
+```bash
+# Install via NPM from our organisation
+npm i @ctek/wcm
+
+# Install via Bower, either of these will work
+bower i wcm
+bower i Ctek/wcm
+```
+
 ## Notes about usage
 This library currently relies on [WebComponents.js](https://github.com/webcomponents/webcomponentsjs) when used in browsers that have not yet implemented basic support for Web Components. It's important that this is loaded before loading WCM, meaning that the head of your index file should include something similar to this:
 
