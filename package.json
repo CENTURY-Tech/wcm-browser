@@ -3,6 +3,7 @@
   "version": "0.2.3",
   "description": "Clear cut dependency management for Web Components",
   "main": "dist/wcm.js",
+  "types": "dist/wcm.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "postbuild": "uglifyjs dist/wcm.js -c -m -o dist/wcm.min.js",

@@ -1,2 +1,12 @@
 # Ignore the source files
 src
+
+# Ignore NPM debug log and Bower related paths
+bower_components/
+bower.json
+npm-debug.log
+
+# Ignore TS related paths
+tsconfig.json
+tslint.json
+
