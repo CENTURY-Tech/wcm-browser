@@ -5,7 +5,7 @@ Clear cut dependency management for Web Components
 [![npm](https://img.shields.io/npm/v/@ctek/wcm.svg?style=flat-square)](https://www.npmjs.com/package/@ctek/wcm) [![Bower](https://img.shields.io/bower/v/wcm.svg?style=flat-square)](https://github.com/CENTURY-Tech/wcm)
 
 ## Project description
-This library aims to improve the way we deploy and push updates to applications by enabling developers to defer user impacting changes without impeding development, and minimise cache invalidation wherever possible. It aims tp address two key issues in the way we manage Web based projects today...
+This library aims to improve the way we deploy and push updates to applications by enabling developers to defer user impacting changes without impeding development, and minimise cache invalidation wherever possible. It aims to address two key issues in the way we manage Web based projects today...
 
 - With the advent of Web Components, applications and their dependencies are quickly becoming hard to maintain as they grow. For example, a small change in a child component with uncontrolled dependencies can lead to breaking changes in the consuming application that are hard to debug.
 
