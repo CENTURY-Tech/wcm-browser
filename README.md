@@ -16,15 +16,14 @@ With WCM, applications have explicitly defined dependencies that are resolved at
 This allows for continuous releases of a given dependency component, without affecting the end user.
 
 ## Installation
-We push versions to both NPM, under [the Ctek organisation](https://www.npmjs.com/org/ctek), and Bower, under the Ctek namespace and directly by name.
+We push versions to both NPM, under [the Ctek organisation](https://www.npmjs.com/org/ctek), and Bower directly by it's name.
 
 ```bash
 # Install via NPM from our organisation
 npm i @ctek/wcm
 
-# Install via Bower, either of these will work
+# Install via Bower
 bower i wcm
-bower i Ctek/wcm
 ```
 
 ## Notes about usage
