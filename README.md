@@ -1,6 +1,6 @@
-# Web Components Manager
+# Web Components Manager Browser
 
-Clear cut dependency management for Web Components
+A suite of HTML Elements used by WCM
 
 [![npm](https://img.shields.io/npm/v/@ctek/wcm.svg?style=flat-square)](https://www.npmjs.com/package/@ctek/wcm) [![Bower](https://img.shields.io/bower/v/wcm.svg?style=flat-square)](https://github.com/CENTURY-Tech/wcm)
 
