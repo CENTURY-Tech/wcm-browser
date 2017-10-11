@@ -20,7 +20,7 @@ We push versions to both NPM, under [the Ctek organisation](https://www.npmjs.co
 
 ```bash
 # Install via NPM from our organisation
-npm i @ctek/wcm
+npm i @ctek/wcm-browser
 
 # Install via Bower
 bower i wcm
