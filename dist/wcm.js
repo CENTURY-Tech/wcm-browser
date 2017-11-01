@@ -285,12 +285,19 @@ var WebComponentsManager;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Shell.prototype, "disableShadow", {
+            get: function () {
+                return this.hasAttribute("disable-shadow");
+            },
+            enumerable: true,
+            configurable: true
+        });
         Shell.prototype.connectedCallback = function () {
             this.bootstrapApplication();
         };
         Shell.prototype.bootstrapApplication = function () {
             var _this = this;
-            var shadow = this.attachShadow && this.attachShadow({ mode: "open" }) || this;
+            var container = this.disableShadow ? this : this.attachShadow && this.attachShadow({ mode: "open" }) || this;
             var fragment = document.createDocumentFragment();
             return Promise.resolve(this.url)
                 .then(function (url) {
@@ -298,20 +305,10 @@ var WebComponentsManager;
             })
                 .then(function (manifest) {
                 WebComponentsManager.Shrinkwrap.manifest = manifest;
-                if (_this.for || _this.path) {
-                    var config = {};
-                    if (_this.for) {
-                        config.for = _this.for;
-                    }
-                    if (_this.path) {
-                        config.path = _this.path;
-                    }
-                    return WebComponentsManager.Utils.whenDefined(WebComponentsManager.DOM.createElement("wcm-link", config), WebComponentsManager.DOM.ready);
+                if (!_this.disableShadow) {
+                    fragment.appendChild(document.createElement("slot"));
+                    container.appendChild(fragment);
                 }
-            })
-                .then(function () {
-                fragment.appendChild(document.createElement(_this.firstChild ? "slot" : _this.for));
-                shadow.appendChild(fragment);
             })
                 .then(function () {
                 _this[WebComponentsManager.DOM.ready] = true;

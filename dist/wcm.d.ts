@@ -56,6 +56,7 @@ declare namespace WebComponentsManager {
 declare namespace WebComponentsManager {
     class Shell extends Base {
         readonly url: string;
+        readonly disableShadow: boolean;
         connectedCallback(): void;
         private bootstrapApplication();
     }

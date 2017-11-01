@@ -19,14 +19,22 @@ namespace WebComponentsManager {
     }
 
     /**
-     * Legacy callback support for WebComponents V0. This method will begin the bootstrapping process within the Shell.
+     * Shadow DOM is enabled by default but users may disable it by setting the attribute disable-shadow
+     *
+     * @type {Boolean}
+     */
+    public get disableShadow(): boolean {
+      return this.hasAttribute("disable-shadow");
+    }
+
+    /**
+     * This method will begin the bootstrapping process within the Shell.
      *
      * @returns {Void}
      */
     public connectedCallback(): void {
       this.bootstrapApplication();
     }
-
 
     /**
      * This is a private method responsible for the bootstrapping of the Shell. It will load the Manifest, import the
@@ -37,7 +45,7 @@ namespace WebComponentsManager {
      * @returns {Promise<Void>}
      */
     private bootstrapApplication(): Promise<void> {
-      const shadow = this.attachShadow && this.attachShadow({ mode: "open" }) || this;
+      const container = this.disableShadow ? this : this.attachShadow && this.attachShadow({ mode: "open" }) || this;
       const fragment = document.createDocumentFragment();
 
       return Promise.resolve(this.url)
@@ -46,24 +54,10 @@ namespace WebComponentsManager {
         })
         .then((manifest: Manifest) => {
           Shrinkwrap.manifest = manifest;
-
-          if (this.for || this.path) {
-            const config: {[key in "for" | "path"]?: string} = {};
-
-            if (this.for) {
-              config.for = this.for;
-            }
-
-            if (this.path) {
-              config.path = this.path;
-            }
-
-            return Utils.whenDefined(DOM.createElement("wcm-link", config), DOM.ready);
+          if (!this.disableShadow) {
+            fragment.appendChild(document.createElement("slot"));
+            container.appendChild(fragment);
           }
-        })
-        .then((): void => {
-          fragment.appendChild(document.createElement(this.firstChild ? "slot" : this.for));
-          shadow.appendChild(fragment);
         })
         .then((): void => {
           this[DOM.ready] = true;

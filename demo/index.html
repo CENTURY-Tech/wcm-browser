@@ -25,7 +25,12 @@
 <body>
   <wcm-shell url="/demo/wcm-shrinkwrap.json">
     <wcm-link for="test" path="test-component.html"></wcm-link>
-    <test-component></test-component>
+    <test-component msg="it works with shadow DOM"></test-component>
+  </wcm-shell>
+
+  <wcm-shell url="/demo/wcm-shrinkwrap.json" disable-shadow>
+    <wcm-link for="test" path="test-component.html"></wcm-link>
+    <test-component msg="it works without shadow DOM"></test-component>
   </wcm-shell>
 </body>
 

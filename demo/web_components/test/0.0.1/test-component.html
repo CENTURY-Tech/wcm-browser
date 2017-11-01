@@ -7,7 +7,7 @@
 
   TestComponent.prototype.connectedCallback = function () {
     var elm = document.createElement("DIV");
-    elm.innerHTML = "<p>This Works</p>";
+    elm.innerHTML = "<p>" + this.getAttribute("msg")+ "</p>";
     this.appendChild(elm);
   }
 
