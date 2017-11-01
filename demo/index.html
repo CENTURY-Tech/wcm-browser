@@ -14,6 +14,8 @@
       document.write('\x3Cscript src="/bower_components/webcomponentsjs/custom-elements-es5-adapter.js">\x3C/script>');
       if (!window.customElements) {
         document.write('\x3Cscript src="/bower_components/webcomponentsjs/webcomponents-lite.js">\x3C/script>');
+      } else if(!('import' in document.createElement('link'))) {
+        document.write('\x3Cscript src="/bower_components/webcomponentsjs/webcomponents-hi.js">\x3C/script>');
       }
     }
   </script>
