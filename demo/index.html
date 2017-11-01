@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+
+  <script>
+    if (!(window.ActiveXObject) && "ActiveXObject" in window) {
+      document.write('\x3Cscript src="/bower_components/webcomponentsjs/webcomponents-loader.js">\x3C/script>');
+    } else {
+      document.write('\x3Cscript src="/bower_components/webcomponentsjs/custom-elements-es5-adapter.js">\x3C/script>');
+      if (!window.customElements) {
+        document.write('\x3Cscript src="/bower_components/webcomponentsjs/webcomponents-lite.js">\x3C/script>');
+      }
+    }
+  </script>
+
+  <script src="/bower_components/es6-shim/es6-shim.min.js"></script>
+  <script src="/dist/wcm.js"></script>
+</head>
+
+<body>
+  <wcm-shell url="/demo/wcm-shrinkwrap.json">
+    <wcm-link for="test" path="test-component.html"></wcm-link>
+    <test-component></test-component>
+  </wcm-shell>
+</body>
+
+</html>

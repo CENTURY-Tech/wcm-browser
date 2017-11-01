@@ -21,5 +21,12 @@
   ],
   "dependencies": {
     "webcomponentsjs": "~0"
+  },
+  "devDependencies": {
+    "es6-shim": "^0.35.3",
+    "webcomponentsjs": "^1.0.17"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^1.0.17"
   }
 }

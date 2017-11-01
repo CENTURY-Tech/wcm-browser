@@ -24,6 +24,18 @@ namespace WebComponentsManager {
     version: string;
   }
 
+  function getCustomElements(): Promise<CustomElementRegistry> {
+    if (window.customElements) {
+      return Promise.resolve(customElements);
+    }
+
+    return new Promise((res) => {
+      window.addEventListener("WebComponentsReady", function() {
+        res(customElements);
+      });
+    });
+  }
+
   /**
    * @namespace WebComponentsManager.DOM
    */
@@ -36,7 +48,22 @@ namespace WebComponentsManager {
       "wcm-script": Script;
     }
 
-    export const ready = Symbol();
+    export const ready = "__ready";
+
+    export function createElement<K extends CustomHTMLElementTagName>(
+      tagName: K,
+      attrs: object,
+    ): CustomHTMLElementTagNameMap[K] {
+      const elem = document.createElement(tagName);
+
+      for (const key in attrs) {
+        if (attrs.hasOwnProperty(key)) {
+          elem.setAttribute(key, attrs[key]);
+        }
+      }
+
+      return elem;
+    }
 
     /**
      * This decorator registers the targeted class as a new custom Web Component with the name provided.
@@ -47,18 +74,10 @@ namespace WebComponentsManager {
      */
     export function registerComponent<T>(name: string): (target: T) => void {
       return (target: T): void => {
-        document["registerElement"](name, { prototype: (target as any).prototype });
+        getCustomElements().then((customElements: CustomElementRegistry) => {
+          customElements.define(name, (target as any));
+        });
       };
-    }
-
-    export function createElement<K extends CustomHTMLElementTagName>(tagName: K, attrs: object): CustomHTMLElementTagNameMap[K] {
-      const elem = document.createElement(tagName);
-
-      for (let key in attrs) {
-        elem.setAttribute(key, attrs[key]);
-      }
-
-      return elem;
     }
 
     export function waitForLink(link: HTMLLinkElement): Promise<void | void[]> {
@@ -67,7 +86,7 @@ namespace WebComponentsManager {
           ...[].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink),
           ...[].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
             return Utils.whenDefined(elem, DOM.ready);
-          })
+          }),
         ])
         : promisifyEvent(link, "load").then(() => waitForLink(link));
     }
@@ -98,8 +117,8 @@ namespace WebComponentsManager {
      */
     export let manifest: Manifest;
 
-    function getDependencyByName(manifest: Manifest, name: string): Dependency | never {
-      for (let dependency of manifest.shrinkwrap) {
+    function getDependencyByName(config: Manifest, name: string): Dependency | never {
+      for (const dependency of config.shrinkwrap) {
         if (dependency.name === name) {
           return dependency;
         }
@@ -118,10 +137,10 @@ namespace WebComponentsManager {
           : /.*\//.exec(target.baseURI)[0] + path);
       } else {
         return Utils.whenDefined(Shrinkwrap, "manifest")
-          .then((manifest: Manifest): string => {
-            const dependency = getDependencyByName(manifest, dependencyName);
+          .then((config: Manifest): string => {
+            const dependency = getDependencyByName(config, dependencyName);
 
-            return (dependency.uri || manifest.uri)
+            return (dependency.uri || config.uri)
               .replace("<name>", dependency.name)
               .replace("<version>", dependency.version)
               .replace("<path>", path || "index.html");
@@ -183,7 +202,11 @@ namespace WebComponentsManager {
       if (!obj.hasOwnProperty(key)) {
         let setter;
         let getter: any = new Promise<T>((resolve): void => {
-          setter = (val: T) => (getter = val, setter = () => null, resolve(val));
+          setter = (val: T) => {
+            getter = val;
+            setter = () => null;
+            resolve(val);
+          };
         });
 
         Object.defineProperty(obj, key, { get: () => getter, set: setter });

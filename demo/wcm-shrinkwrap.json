@@ -1,0 +1,9 @@
+{
+  "uri": "./web_components/<name>/<version>/<path>",
+  "shrinkwrap": [
+    {
+      "name": "test",
+      "version": "0.0.1"
+    }
+  ]
+}

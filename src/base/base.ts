@@ -6,7 +6,8 @@ namespace WebComponentsManager {
    */
   export abstract class Base extends HTMLElement {
 
-    public observedAttributes = ["path"];
+    public static loader = "__loader";
+    public static observedAttributes = ["path", "for"];
 
     /**
      * The name of the dependency that should be imported.
@@ -27,11 +28,10 @@ namespace WebComponentsManager {
     }
 
     /**
-     * Legacy callback support for WebComponents V0.
      *
      * @returns {Void}
      */
-    public createdCallback(this: Base): void {
+    public connectedCallback(): void {
       if (!this[Base.loader]) {
         return;
       }
@@ -48,8 +48,12 @@ namespace WebComponentsManager {
         .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
     }
 
-    static loader = Symbol();
-
   }
+
+  /**
+   * https://github.com/webcomponents/webcomponentsjs/issues/809
+   * required for Firefox
+   */
+  Base.prototype.constructor = Base;
 
 }

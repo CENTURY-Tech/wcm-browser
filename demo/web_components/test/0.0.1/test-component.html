@@ -1,0 +1,15 @@
+<script>
+  __extends(TestComponent, HTMLElement);
+  function TestComponent() {
+    var _super = HTMLElement;
+    return _super.apply(this, arguments) || this;
+  }
+
+  TestComponent.prototype.connectedCallback = function () {
+    var elm = document.createElement("DIV");
+    elm.innerHTML = "<p>This Works</p>";
+    this.appendChild(elm);
+  }
+
+  customElements.define("test-component", TestComponent);
+</script>

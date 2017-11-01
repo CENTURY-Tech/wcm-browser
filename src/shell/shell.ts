@@ -23,9 +23,10 @@ namespace WebComponentsManager {
      *
      * @returns {Void}
      */
-    public attachedCallback(): void {
+    public connectedCallback(): void {
       this.bootstrapApplication();
     }
+
 
     /**
      * This is a private method responsible for the bootstrapping of the Shell. It will load the Manifest, import the
@@ -66,7 +67,7 @@ namespace WebComponentsManager {
         })
         .then((): void => {
           this[DOM.ready] = true;
-        })
+        });
     }
 
   }

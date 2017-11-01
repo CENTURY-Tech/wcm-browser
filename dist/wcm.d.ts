@@ -16,9 +16,9 @@ declare namespace WebComponentsManager {
             "wcm-link": Link;
             "wcm-script": Script;
         }
-        const ready: symbol;
-        function registerComponent<T>(name: string): (target: T) => void;
+        const ready = "__ready";
         function createElement<K extends CustomHTMLElementTagName>(tagName: K, attrs: object): CustomHTMLElementTagNameMap[K];
+        function registerComponent<T>(name: string): (target: T) => void;
         function waitForLink(link: HTMLLinkElement): Promise<void | void[]>;
         function promisifyEvent(target: HTMLElement, event: string): Promise<Event>;
     }
@@ -35,12 +35,12 @@ declare namespace WebComponentsManager {
 }
 declare namespace WebComponentsManager {
     abstract class Base extends HTMLElement {
-        observedAttributes: string[];
+        static loader: string;
+        static observedAttributes: string[];
         readonly for: string;
         readonly path: string;
-        createdCallback(this: Base): void;
+        connectedCallback(): void;
         attributeChangedCallback(): void;
-        static loader: symbol;
     }
 }
 declare namespace WebComponentsManager {
@@ -56,7 +56,7 @@ declare namespace WebComponentsManager {
 declare namespace WebComponentsManager {
     class Shell extends Base {
         readonly url: string;
-        attachedCallback(): void;
+        connectedCallback(): void;
         private bootstrapApplication();
     }
 }

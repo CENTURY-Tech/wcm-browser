@@ -15,7 +15,7 @@ namespace WebComponentsManager {
         ...[].map.call(this.ownerDocument.querySelectorAll("link[rel='import']"), DOM.waitForLink),
         ...[].map.call(this.ownerDocument.querySelectorAll("wcm-link"), (link: Link) => {
           return Utils.whenDefined(link, DOM.ready);
-        })
+        }),
       ])
         .then((): Promise<string> => {
           return Shrinkwrap.generateDownloadUrl(this, this.for, this.path);
@@ -36,7 +36,7 @@ namespace WebComponentsManager {
         })
         .then((): void => {
           this[DOM.ready] = true;
-        })
+        });
     }
 
   }
