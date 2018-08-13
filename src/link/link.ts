@@ -21,26 +21,17 @@ namespace WebComponentsManager {
       return this.getAttribute("rel") as HTMLLinkElementRel;
     }
 
-    public [Base.loader](this: Link): Promise<void> {
-      return Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
-        .then((href): Promise<boolean> => {
-          let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement;
+    public [Base.loader](this: Link, _context: Document, href: String): Promise<any> {
+      const link = document.head.appendChild(DOM.createElement("link", { rel: this.rel || "import", href }));
 
-          if (!link) {
-            link = document.head.appendChild(DOM.createElement("link", { rel: this.rel || "import", href }));
-
-            DOM.waitForLink(link)
-              .then(() => {
-                link[DOM.ready] = true;
-              });
-          }
-
-          return Utils.whenDefined<boolean>(link, DOM.ready);
-        })
-        .then((): void => {
-          this[DOM.ready] = true;
-        });
+      return DOM.promisifyEvent(link, "load").then(() => {
+        return Promise.all([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
+          elem[Base.load](link.import)
+          return Utils.whenDefined(elem, DOM.ready);
+        }));
+      });
     }
 
   }
+
 }

@@ -4,6 +4,26 @@
     {
       "name": "test",
       "version": "0.0.1"
+    },
+    {
+      "name": "wrapper-a",
+      "version": "0.0.1"
+    },
+    {
+      "name": "wrapper-b",
+      "version": "0.0.1"
+    },
+    {
+      "name": "wrapper-c",
+      "version": "0.0.1"
+    },
+    {
+      "name": "wrapper-d",
+      "version": "0.0.1"
+    },
+    {
+      "name": "wrapper-e",
+      "version": "0.0.1"
     }
   ]
 }

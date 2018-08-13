@@ -9,6 +9,10 @@ namespace WebComponentsManager {
   @DOM.registerComponent("wcm-shell")
   export class Shell extends Base {
 
+    public get context(): Document {
+      return document;
+    }
+
     /**
      * The URL of the Manifest to be loaded and then parsed by the Shell.
      *
@@ -46,7 +50,6 @@ namespace WebComponentsManager {
      */
     private bootstrapApplication(): Promise<void> {
       const container = this.disableShadow ? this : this.attachShadow && this.attachShadow({ mode: "open" }) || this;
-      const fragment = document.createDocumentFragment();
 
       return Promise.resolve(this.url)
         .then((url: string): Promise<Manifest> => {
@@ -54,10 +57,18 @@ namespace WebComponentsManager {
         })
         .then((manifest: Manifest) => {
           Shrinkwrap.manifest = manifest;
+
           if (!this.disableShadow) {
+            const fragment = document.createDocumentFragment();
+
             fragment.appendChild(document.createElement("slot"));
             container.appendChild(fragment);
           }
+
+          return Promise.all([].map.call(this.querySelectorAll("wcm-link, wcm-script"), ((elem: Link | Script) => {
+            elem[Base.load](document);
+            return Utils.whenDefined(elem, DOM.ready);
+          })));
         })
         .then((): void => {
           this[DOM.ready] = true;

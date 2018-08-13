@@ -17,16 +17,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var WebComponentsManager;
 (function (WebComponentsManager) {
-    function getCustomElements() {
-        if (window.customElements) {
-            return Promise.resolve(customElements);
-        }
-        return new Promise(function (res) {
-            window.addEventListener("WebComponentsReady", function () {
-                res(customElements);
-            });
-        });
-    }
     var DOM;
     (function (DOM) {
         DOM.ready = "__ready";
@@ -42,20 +32,12 @@ var WebComponentsManager;
         DOM.createElement = createElement;
         function registerComponent(name) {
             return function (target) {
-                getCustomElements().then(function (customElements) {
+                Utils.whenDefined(window, "customElements").then(function (customElements) {
                     customElements.define(name, target);
                 });
             };
         }
         DOM.registerComponent = registerComponent;
-        function waitForLink(link) {
-            return link.import
-                ? Promise.all([].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink).concat([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
-                    return Utils.whenDefined(elem, DOM.ready);
-                })))
-                : promisifyEvent(link, "load").then(function () { return waitForLink(link); });
-        }
-        DOM.waitForLink = waitForLink;
         function promisifyEvent(target, event) {
             var handler = function (resolve) {
                 return function (evt) {
@@ -91,7 +73,7 @@ var WebComponentsManager;
                 return Utils.whenDefined(Shrinkwrap, "manifest")
                     .then(function (config) {
                     var dependency = getDependencyByName(config, dependencyName);
-                    return (dependency.uri || config.uri)
+                    return document.baseURI + (dependency.uri || config.uri)
                         .replace("<name>", dependency.name)
                         .replace("<version>", dependency.version)
                         .replace("<path>", path || "index.html");
@@ -121,22 +103,6 @@ var WebComponentsManager;
             });
         }
         Utils.fetchResource = fetchResource;
-        function timeoutPromise(ms, promise) {
-            var id;
-            var timeout = new Promise(function (_, reject) {
-                id = setTimeout(function () {
-                    reject("Timed out in " + ms + " ms");
-                }, ms);
-            });
-            return Promise.race([
-                promise,
-                timeout,
-            ]).then(function (result) {
-                clearTimeout(id);
-                return result;
-            });
-        }
-        Utils.timeoutPromise = timeoutPromise;
         function whenDefined(obj, key) {
             if (!obj.hasOwnProperty(key)) {
                 var setter_1;
@@ -156,6 +122,9 @@ var WebComponentsManager;
 })(WebComponentsManager || (WebComponentsManager = {}));
 var WebComponentsManager;
 (function (WebComponentsManager) {
+    var load = "__load";
+    var loader = "__loader";
+    var elements = {};
     var Base = (function (_super) {
         __extends(Base, _super);
         function Base() {
@@ -175,21 +144,23 @@ var WebComponentsManager;
             enumerable: true,
             configurable: true
         });
-        Base.prototype.connectedCallback = function () {
-            if (!this[Base.loader]) {
-                return;
-            }
-            if (this.for || this.path) {
-                this.attributeChangedCallback();
-            }
+        Base.prototype[load] = function (context) {
+            var _this = this;
+            WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+                .then(function (href) {
+                if (elements[href]) {
+                    return elements[href];
+                }
+                else {
+                    return elements[href] = _this[Base.loader](context, href);
+                }
+            })
+                .then(function () {
+                _this[WebComponentsManager.DOM.ready] = true;
+            });
         };
-        Base.prototype.attributeChangedCallback = function () {
-            delete this.attributeChangedCallback;
-            WebComponentsManager.Utils.timeoutPromise(WebComponentsManager.Utils.timeoutDuration, this[Base.loader]())
-                .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
-        };
-        Base.loader = "__loader";
-        Base.observedAttributes = ["path", "for"];
+        Base.load = load;
+        Base.loader = loader;
         return Base;
     }(HTMLElement));
     WebComponentsManager.Base = Base;
@@ -209,22 +180,13 @@ var WebComponentsManager;
             enumerable: true,
             configurable: true
         });
-        Link.prototype[WebComponentsManager.Base.loader] = function () {
-            var _this = this;
-            return WebComponentsManager.Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
-                .then(function (href) {
-                var link = document.head.querySelector("link[href=\"" + href + "\"]");
-                if (!link) {
-                    link = document.head.appendChild(WebComponentsManager.DOM.createElement("link", { rel: _this.rel || "import", href: href }));
-                    WebComponentsManager.DOM.waitForLink(link)
-                        .then(function () {
-                        link[WebComponentsManager.DOM.ready] = true;
-                    });
-                }
-                return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
-            })
-                .then(function () {
-                _this[WebComponentsManager.DOM.ready] = true;
+        Link.prototype[WebComponentsManager.Base.loader] = function (_context, href) {
+            var link = document.head.appendChild(WebComponentsManager.DOM.createElement("link", { rel: this.rel || "import", href: href }));
+            return WebComponentsManager.DOM.promisifyEvent(link, "load").then(function () {
+                return Promise.all([].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), function (elem) {
+                    elem[WebComponentsManager.Base.load](link.import);
+                    return WebComponentsManager.Utils.whenDefined(elem, WebComponentsManager.DOM.ready);
+                }));
             });
         };
         Link = __decorate([
@@ -241,27 +203,11 @@ var WebComponentsManager;
         function Script() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Script.prototype[WebComponentsManager.Base.loader] = function () {
-            var _this = this;
-            return Promise.all([].map.call(this.ownerDocument.querySelectorAll("link[rel='import']"), WebComponentsManager.DOM.waitForLink).concat([].map.call(this.ownerDocument.querySelectorAll("wcm-link"), function (link) {
+        Script.prototype[WebComponentsManager.Base.loader] = function (context, src) {
+            return Promise.all([].map.call(context.querySelectorAll("wcm-link"), function (link) {
                 return WebComponentsManager.Utils.whenDefined(link, WebComponentsManager.DOM.ready);
-            })))
-                .then(function () {
-                return WebComponentsManager.Shrinkwrap.generateDownloadUrl(_this, _this.for, _this.path);
-            })
-                .then(function (src) {
-                var script = document.body.querySelector("script[src=\"" + src + "\"]");
-                if (!script) {
-                    script = document.body.appendChild(WebComponentsManager.DOM.createElement("script", { src: src }));
-                    WebComponentsManager.DOM.promisifyEvent(script, "load")
-                        .then(function () {
-                        script[WebComponentsManager.DOM.ready] = true;
-                    });
-                }
-                return WebComponentsManager.Utils.whenDefined(script, WebComponentsManager.DOM.ready);
-            })
-                .then(function () {
-                _this[WebComponentsManager.DOM.ready] = true;
+            })).then(function () {
+                return WebComponentsManager.DOM.promisifyEvent(document.body.appendChild(WebComponentsManager.DOM.createElement("script", { src: src })), "load");
             });
         };
         Script = __decorate([
@@ -278,6 +224,13 @@ var WebComponentsManager;
         function Shell() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(Shell.prototype, "context", {
+            get: function () {
+                return document;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Shell.prototype, "url", {
             get: function () {
                 return this.getAttribute("url");
@@ -298,7 +251,6 @@ var WebComponentsManager;
         Shell.prototype.bootstrapApplication = function () {
             var _this = this;
             var container = this.disableShadow ? this : this.attachShadow && this.attachShadow({ mode: "open" }) || this;
-            var fragment = document.createDocumentFragment();
             return Promise.resolve(this.url)
                 .then(function (url) {
                 return WebComponentsManager.Utils.fetchResource(url).then(JSON.parse);
@@ -306,9 +258,14 @@ var WebComponentsManager;
                 .then(function (manifest) {
                 WebComponentsManager.Shrinkwrap.manifest = manifest;
                 if (!_this.disableShadow) {
+                    var fragment = document.createDocumentFragment();
                     fragment.appendChild(document.createElement("slot"));
                     container.appendChild(fragment);
                 }
+                return Promise.all([].map.call(_this.querySelectorAll("wcm-link, wcm-script"), (function (elem) {
+                    elem[WebComponentsManager.Base.load](document);
+                    return WebComponentsManager.Utils.whenDefined(elem, WebComponentsManager.DOM.ready);
+                })));
             })
                 .then(function () {
                 _this[WebComponentsManager.DOM.ready] = true;

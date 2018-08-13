@@ -22,17 +22,25 @@
 
   <script src="/bower_components/es6-shim/es6-shim.min.js"></script>
   <script src="/dist/wcm.js"></script>
+
+  <script>
+    WebComponentsManager.Utils.timeoutDuration = 1000
+  </script>
 </head>
 
 <body>
   <wcm-shell url="/demo/wcm-shrinkwrap.json">
     <wcm-link for="test" path="test-component.html"></wcm-link>
+    <wcm-link for="wrapper-e" path="wrapper-e.html"></wcm-link>
     <test-component msg="it works with shadow DOM"></test-component>
+    <wrapper-e></wrapper-e>
   </wcm-shell>
 
   <wcm-shell url="/demo/wcm-shrinkwrap.json" disable-shadow>
     <wcm-link for="test" path="test-component.html"></wcm-link>
+    <wcm-link for="wrapper-e" path="wrapper-e.html"></wcm-link>
     <test-component msg="it works without shadow DOM"></test-component>
+    <wrapper-e></wrapper-e>
   </wcm-shell>
 </body>
 

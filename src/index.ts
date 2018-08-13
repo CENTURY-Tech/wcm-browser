@@ -24,17 +24,22 @@ namespace WebComponentsManager {
     version: string;
   }
 
-  function getCustomElements(): Promise<CustomElementRegistry> {
-    if (window.customElements) {
-      return Promise.resolve(customElements);
-    }
-
-    return new Promise((res) => {
-      window.addEventListener("WebComponentsReady", function() {
-        res(customElements);
-      });
-    });
+  export interface Loader {
+    element: HTMLElement;
+    dependencies: Base[];
   }
+
+  // function getCustomElements(): Promise<CustomElementRegistry> {
+  //   if (window.customElements) {
+  //     return Promise.resolve(customElements);
+  //   }
+
+  //   return new Promise((res) => {
+  //     window.addEventListener("WebComponentsReady", function() {
+  //       res(customElements);
+  //     });
+  //   });
+  // }
 
   /**
    * @namespace WebComponentsManager.DOM
@@ -72,26 +77,15 @@ namespace WebComponentsManager {
      *
      * @returns {Void}
      */
-    export function registerComponent<T>(name: string): (target: T) => void {
+    export function registerComponent<T extends Function>(name: string): (target: T) => void {
       return (target: T): void => {
-        getCustomElements().then((customElements: CustomElementRegistry) => {
-          customElements.define(name, (target as any));
+        Utils.whenDefined(window, "customElements").then((customElements: CustomElementRegistry): void => {
+          customElements.define(name, target);
         });
       };
     }
 
-    export function waitForLink(link: HTMLLinkElement): Promise<void | void[]> {
-      return link.import
-        ? Promise.all<void>([
-          ...[].map.call(link.import.querySelectorAll("link[rel='import']"), waitForLink),
-          ...[].map.call(link.import.querySelectorAll("wcm-link, wcm-script"), (elem: Link | Script) => {
-            return Utils.whenDefined(elem, DOM.ready);
-          }),
-        ])
-        : promisifyEvent(link, "load").then(() => waitForLink(link));
-    }
-
-    export function promisifyEvent(target: HTMLElement, event: string): Promise<Event> {
+    export function promisifyEvent(target: Node, event: string): Promise<Event> {
       let handler: any = (resolve) => {
         return (evt: Event): void => {
           target.removeEventListener(event, handler);
@@ -140,7 +134,7 @@ namespace WebComponentsManager {
           .then((config: Manifest): string => {
             const dependency = getDependencyByName(config, dependencyName);
 
-            return (dependency.uri || config.uri)
+            return document.baseURI + (dependency.uri || config.uri)
               .replace("<name>", dependency.name)
               .replace("<version>", dependency.version)
               .replace("<path>", path || "index.html");
@@ -178,23 +172,6 @@ namespace WebComponentsManager {
 
         request.open("GET", url, true);
         request.send(null);
-      });
-    }
-
-    export function timeoutPromise<T>(ms: number, promise: Promise<T>): Promise<T> {
-      let id;
-      const timeout = new Promise<void>((_, reject) => {
-        id = setTimeout(() => {
-          reject(`Timed out in ${ms} ms`);
-        }, ms);
-      });
-
-      return Promise.race([
-        promise,
-        timeout,
-      ]).then((result: T): T => {
-        clearTimeout(id);
-        return result;
       });
     }
 

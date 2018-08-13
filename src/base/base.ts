@@ -1,13 +1,18 @@
 namespace WebComponentsManager {
 
+  const load = "__load";
+  const loader = "__loader";
+
+  const elements: { [x: string]: Promise<Link | Script> } = {};
+
   /**
    * @class WebComponentsManager.Base
    * @extends HTMLElement
    */
-  export abstract class Base extends HTMLElement {
+  export class Base extends HTMLElement {
 
-    public static loader = "__loader";
-    public static observedAttributes = ["path", "for"];
+    public static load = load;
+    public static loader = loader;
 
     /**
      * The name of the dependency that should be imported.
@@ -27,25 +32,24 @@ namespace WebComponentsManager {
       return this.getAttribute("path");
     }
 
-    /**
-     *
-     * @returns {Void}
-     */
-    public connectedCallback(): void {
-      if (!this[Base.loader]) {
-        return;
-      }
+    // public connectedCallback(): void {
+    //   if (this[Base.loader] && this.for || this.path) {
+    //     this[load](document);
+    //   }
+    // }
 
-      if (this.for || this.path) {
-        this.attributeChangedCallback();
-      }
-    }
-
-    public attributeChangedCallback() {
-      delete this.attributeChangedCallback;
-
-      Utils.timeoutPromise<void>(Utils.timeoutDuration, this[Base.loader]())
-        .catch(console.error.bind(null, "Error from '%s': %o", this.for || this.path));
+    public [load](this: Base, context: Document): void {
+      Shrinkwrap.generateDownloadUrl(this, this.for, this.path)
+        .then((href: string): Promise<Link | Script> => {
+          if (elements[href]) {
+            return elements[href];
+          } else {
+            return elements[href] = this[Base.loader](context, href);
+          }
+        })
+        .then((): void => {
+          this[DOM.ready] = true;
+        });
     }
 
   }

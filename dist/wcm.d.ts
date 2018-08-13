@@ -10,6 +10,10 @@ declare namespace WebComponentsManager {
         name: string;
         version: string;
     }
+    interface Loader {
+        element: HTMLElement;
+        dependencies: Base[];
+    }
     namespace DOM {
         type CustomHTMLElementTagName = keyof HTMLElementTagNameMap | "wcm-link" | "wcm-script";
         interface CustomHTMLElementTagNameMap extends HTMLElementTagNameMap {
@@ -18,9 +22,8 @@ declare namespace WebComponentsManager {
         }
         const ready = "__ready";
         function createElement<K extends CustomHTMLElementTagName>(tagName: K, attrs: object): CustomHTMLElementTagNameMap[K];
-        function registerComponent<T>(name: string): (target: T) => void;
-        function waitForLink(link: HTMLLinkElement): Promise<void | void[]>;
-        function promisifyEvent(target: HTMLElement, event: string): Promise<Event>;
+        function registerComponent<T extends Function>(name: string): (target: T) => void;
+        function promisifyEvent(target: Node, event: string): Promise<Event>;
     }
     namespace Shrinkwrap {
         let manifest: Manifest;
@@ -29,18 +32,15 @@ declare namespace WebComponentsManager {
     namespace Utils {
         let timeoutDuration: number;
         function fetchResource(url: string): Promise<any>;
-        function timeoutPromise<T>(ms: number, promise: Promise<T>): Promise<T>;
         function whenDefined<T>(obj: object, key: string | symbol): Promise<T>;
     }
 }
 declare namespace WebComponentsManager {
-    abstract class Base extends HTMLElement {
+    class Base extends HTMLElement {
+        static load: string;
         static loader: string;
-        static observedAttributes: string[];
         readonly for: string;
         readonly path: string;
-        connectedCallback(): void;
-        attributeChangedCallback(): void;
     }
 }
 declare namespace WebComponentsManager {
@@ -55,6 +55,7 @@ declare namespace WebComponentsManager {
 }
 declare namespace WebComponentsManager {
     class Shell extends Base {
+        readonly context: Document;
         readonly url: string;
         readonly disableShadow: boolean;
         connectedCallback(): void;

@@ -9,6 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "postbuild": "uglifyjs dist/wcm.js -c -m -o dist/wcm.min.js",
     "docs": "typedoc --name WCM --mode file --out docs --hideGenerator",
+    "install": "bower i",
     "lint": "tslint --project . --fix"
   },
   "repository": {
